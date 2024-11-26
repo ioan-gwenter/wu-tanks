@@ -25,15 +25,15 @@ type GLTFResult = GLTF & {
 }
 
 type PlayerTankProps = JSX.IntrinsicElements['group'] & {
-    headDirection?: [number, number, number];
-    bodyDirection?: [number, number, number];
+    headDirection?: number;
+    bodyDirection?: number;
     playerColor?: string; // Optional color for BodyFlat material
 };
 
 
 export function PlayerTank({
-    headDirection = [-Math.PI, 0, -Math.PI], // Default rotation
-    bodyDirection = [0, 0, -Math.PI], // Default rotation
+    headDirection = 0, // Default rotation
+    bodyDirection = 0,// Default rotation
     playerColor = '#D1BDFF', // Default BodyFlat color
     ...props
 }: PlayerTankProps) {
@@ -41,6 +41,8 @@ export function PlayerTank({
 
     materials['BodyFlat.007'].color = new THREE.Color(playerColor);
     materials['BodyMetallic.007'].color = new THREE.Color(playerColor);
+
+
 
     return (
         <group {...props} dispose={null}>
@@ -52,7 +54,7 @@ export function PlayerTank({
                     geometry={nodes.Head.geometry}
                     material={materials['BodyMetallic.007']}
                     position={[0, 0.164, 0]}
-                    rotation={headDirection}
+                    rotation={[-Math.PI, headDirection, -Math.PI]} // Apply Z-axis rotation
                     scale={[0.098, 0.061, 0.098]}
                     userData={{ name: 'Head' }}>
                     <group
@@ -83,7 +85,8 @@ export function PlayerTank({
                     receiveShadow
                     geometry={nodes.Body.geometry}
                     material={materials['BodyFlat.007']}
-                    rotation={bodyDirection}
+                    // rotation={[0, 0, -Math.PI].map((defaultRot, i) => defaultRot + bodyDirection[i]) as [number, number, number]} for 3 dof
+                    rotation={[0, bodyDirection, -Math.PI]}
                     scale={[-0.13, -0.052, -0.17]}
                     userData={{ name: 'Body' }}>
                     <group name="Tracks" scale={[1.3, 0.952, 0.952]} userData={{ name: 'Tracks' }}>

@@ -5,6 +5,7 @@ import { Stage } from '../components/Stage';
 import { EnemyTank } from '../components/EnemyTank';
 import { MenuTank } from '@/components/canvas/MenuTank';
 import { PlayerTank } from '../components/PlayerTank';
+import { PlayerTankHandler } from '../components/PlayerTankHandler';
 
 
 export default function LobbyScene() {
@@ -19,11 +20,17 @@ export default function LobbyScene() {
             />
             <OrbitControls />
             {/* Stage */}
+            <Stage position={[0.1, -0.07, -0.7]} />
 
+            <PlayerTankHandler
+                position={[0, 0, 0]}
+                bodyDirection={1}
+                headDirection={3}
+                isLocalPlayer={false}
+                name={'test'}
+                playerColor={'blue'} >
+            </PlayerTankHandler>
 
-            <Stage position={[0.1, 0, -0.7]} />
-            <EnemyTank position={[0, 0.11, 0]} rotation={[0, Math.PI / 2, 0]} enemyColor='red' />
-            <PlayerTank position={[0, 0.11, 2]} rotation={[0, Math.PI / 2, 0]} playerColor='blue' />
 
 
             {/* Lights */}
