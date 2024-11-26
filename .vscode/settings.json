@@ -16,7 +16,6 @@
     ".eslintignore": true,
     ".eslintrc": true,
     ".git": true,
-    ".gitignore": true,
     ".next": true,
     ".prettierignore": true,
     ".prettierrc": true,
@@ -33,6 +32,7 @@
     "tsconfig.json": true,
     "yarn.lock": true,
     ".editorconfig": true,
-    "package.json": true
+    "package.json": true,
+    ".gitignore": true
   }
 }

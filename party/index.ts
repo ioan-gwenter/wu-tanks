@@ -1,10 +1,12 @@
 import type * as Party from "partykit/server";
+import { handleRequest } from "./handlers/onRequestHandler";
 
-export default class Server implements Party.Server {
-  constructor(readonly room: Party.Room) {}
+export default class GameServer implements Party.Server {
 
+  constructor(readonly room: Party.Room) { }
+
+  // HANDLE SOCKET CONNECTIONS
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-    // A websocket just connected!
     console.log(
       `Connected:
   id: ${conn.id}
@@ -12,20 +14,20 @@ export default class Server implements Party.Server {
   url: ${new URL(ctx.request.url).pathname}`
     );
 
-    // let's send a message to the connection
     conn.send("hello from server");
   }
 
+  // SERVER MESSAGES
   onMessage(message: string, sender: Party.Connection) {
-    // let's log the message
     console.log(`connection ${sender.id} sent message: ${message}`);
-    // as well as broadcast it to all the other connections in the room...
-    this.room.broadcast(
-      `${sender.id}: ${message}`,
-      // ...except for the connection it came from
-      [sender.id]
-    );
+    this.room.broadcast(`${sender.id}: ${message}`, [sender.id]);
   }
+
+  // HTTP REQUESTS
+  async onRequest(request: Party.Request): Promise<Response> {
+    return handleRequest(this, request);
+  }
+
 }
 
-Server satisfies Party.Worker;
+GameServer satisfies Party.Worker;
