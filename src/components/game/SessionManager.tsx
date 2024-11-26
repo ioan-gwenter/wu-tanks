@@ -4,6 +4,7 @@ import { Common, View } from "../canvas/View";
 import { MenuTank } from "../canvas/MenuTank";
 import LobbyScene from "./scenes/LobbyScene";
 import { Joystick } from "react-joystick-component";
+import GameScene from "./scenes/GameScene";
 
 enum SessionState {
     AWAIT_START = 'AWAIT_START',
@@ -24,7 +25,7 @@ enum Scenes {
 const SceneMap = {
     [Scenes.LOADING]: () => <p>Loading...</p>,
     [Scenes.LOBBY]: LobbyScene,
-    [Scenes.GAME]: () => <MenuTank scale={8} position={[0, -0.4, -1]} />,
+    [Scenes.GAME]: GameScene,
     [Scenes.GAME_OVER]: () => <p>Game Over</p>,
 };
 

@@ -3,8 +3,6 @@
 import { OrbitControls, OrthographicCamera, PerspectiveCamera } from '@react-three/drei';
 import { Stage } from '../components/Stage';
 import { EnemyTank } from '../components/EnemyTank';
-import { MenuTank } from '@/components/canvas/MenuTank';
-import { PlayerTank } from '../components/PlayerTank';
 import { PlayerTankHandler } from '../components/PlayerTankHandler';
 
 
