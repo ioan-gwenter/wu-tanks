@@ -2,7 +2,8 @@
 import { Suspense, useState } from "react";
 import { Common, View } from "../canvas/View";
 import { MenuTank } from "../canvas/MenuTank";
-import { Session } from "inspector/promises";
+import LobbyScene from "./scenes/LobbyScene";
+import { Joystick } from "react-joystick-component";
 
 enum SessionState {
     AWAIT_START = 'AWAIT_START',
@@ -13,11 +14,19 @@ enum SessionState {
 }
 
 enum Scenes {
-    LOADING = "TODO",
-    LOBBY = "TODO",
-    GAME = "TODO",
-    GAME_OVER = "TODO"
+    LOADING = "LOADING",
+    LOBBY = "LOBBY",
+    GAME = "GAME",
+    GAME_OVER = "GAME_OVER"
 }
+
+// Map SceneState to Scene Objects
+const SceneMap = {
+    [Scenes.LOADING]: () => <p>Loading...</p>,
+    [Scenes.LOBBY]: LobbyScene,
+    [Scenes.GAME]: () => <MenuTank scale={8} position={[0, -0.4, -1]} />,
+    [Scenes.GAME_OVER]: () => <p>Game Over</p>,
+};
 
 
 export function SessionManager({ gameId }: { gameId: string }) {
@@ -28,6 +37,8 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
     // Scene Display Management
     const [isLoading, setLoading] = useState<boolean | null>(null);
+    const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOBBY);
+    const CurrentSceneComponent = SceneMap[currentScene];
 
     return (
         <div className="relative h-screen w-screen">
@@ -36,14 +47,23 @@ export function SessionManager({ gameId }: { gameId: string }) {
                 <div className="pointer-events-auto p-4">
                     {/* UI content */}
                     <p className="text-white text-3xl">SESSION STATE: {sessionState}</p>
+
+                    <div className="fix-ios" style={{ position: "absolute", bottom: "3vh", left: "3vw" }}>
+                        <Joystick
+                            size={100}
+                            sticky={false}
+                            baseColor="white"
+                            stickColor="grey"
+                        />
+                    </div>
+
                 </div>
             </div>
 
             {/* 3D View Div */}
             <View className="absolute inset-0 z-0">
                 <Suspense fallback={null}>
-                    <MenuTank scale={8} position={[0, -0.4, -1]} />
-                    <Common color={'black'} />
+                    <CurrentSceneComponent />
                 </Suspense>
             </View>
         </div>
