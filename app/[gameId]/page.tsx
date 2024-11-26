@@ -1,6 +1,6 @@
-import { GameScene } from "@/components/game/scenes/GameScene";
 import { InvalidGame } from "@/components/game/scenes/InvalidGame";
 import { isValidGameId } from "../util/landingPageHelper";
+import { SessionManager } from "@/components/game/SessionManager";
 
 
 export default async function GamePage({
@@ -13,5 +13,5 @@ export default async function GamePage({
         return < InvalidGame />;
     }
 
-    return <GameScene gameId={gameId} />;
+    return <SessionManager gameId={gameId} />;
 }
