@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import dynamic from 'next/dynamic'
+import RotateReminder from '../ui/RotateReminder'
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
 const Layout = ({ children }) => {
@@ -19,6 +20,7 @@ const Layout = ({ children }) => {
       }}
     >
       {children}
+      <RotateReminder></RotateReminder>
       <Scene
         style={{
           position: 'fixed',

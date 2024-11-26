@@ -1,7 +1,9 @@
+"use client"
 import dynamic from 'next/dynamic'
 import { flattenJSON } from 'three/src/animation/AnimationUtils'
 import { Suspense } from 'react'
 
+const InputWithButton = dynamic(() => import('@/components/ui/InputWithButton').then((mod) => mod.default), { ssr: false });
 const MenuTank = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.MenuTank), { ssr: false })
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
@@ -20,18 +22,54 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
+
+const handleNewGame = () => {
+  console.log('Creating a new game...');
+};
+
+const handleJoinGame = () => {
+  console.log('Join a new game...');
+};
+
+
 export default function Page() {
   return (
     <>
-      <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
-        {/* jumbo */}
-        <div className='flex w-full flex-col items-start justify-center p-12 text-center md:w-2/5 md:text-left'>
-          <h1 className='my-4 text-5xl font-bold leading-tight'>Wu tanks</h1>
+      <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center bg-gray-100 overflow-hidden">
+        {/* Left side: Tank view */}
+        <div className="flex h-1/2 w-full md:h-full md:w-1/2 items-center justify-center">
+          <div className="flex h-4/5 w-4/5 items-center justify-center">
+            <View className="flex h-full w-full items-center justify-center">
+              <Suspense fallback={null}>
+                <MenuTank scale={8} position={[0, -1, 0.5]} />
+                <Common />
+              </Suspense>
+            </View>
+          </div>
         </div>
-        <View className='flex h-96 w-full flex-col items-center justify-center'>
-          <MenuTank scale={10} position={[0, -1, 1]} />
-          <Common />
-        </View>
+
+        {/* Right side: Game options */}
+        <div className="flex h-1/2 w-full flex-col items-center justify-center md:h-full md:w-1/2 p-4 md:p-8 lg:p-12">
+          <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl font-bold text-gray-700">
+            Wu Tanks
+          </h1>
+          <div className="mb-6 w-full md:w-2/4 lg:w-1/2">
+            <InputWithButton
+              onSubmit={handleJoinGame}
+              placeholder="Enter Game ID"
+              buttonText="Join Game"
+            />
+          </div>
+          <p className="my-4 text-base md:text-lg lg:text-4xl font-medium text-gray-500">
+            or
+          </p>
+          <button
+            onClick={handleNewGame}
+            className="rounded-md bg-gray-700 px-5 py-3 md:px-6 md:py-3 lg:px-8 lg:py-4 text-sm md:text-base lg:text-lg text-white shadow-md hover:bg-gray-800"
+          >
+            New Game
+          </button>
+        </div>
       </div>
     </>
   )

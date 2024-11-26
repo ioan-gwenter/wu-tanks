@@ -1,4 +1,5 @@
 import { Layout } from '@/components/dom/Layout'
+import RotateReminder from '@/components/ui/RotateReminder'
 import '@/global.css'
 
 export const metadata = {
