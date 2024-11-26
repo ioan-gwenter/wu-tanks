@@ -28,10 +28,17 @@ export default function LobbyScene() {
                 headDirection={3}
                 isLocalPlayer={false}
                 name={'test'}
-                playerColor={'blue'} >
-            </PlayerTankHandler>
+                playerColor={'blue'}
+            />
 
+            <EnemyTank
+                position={[1, 0, 0]}
+                bodyDirection={1}
+                headDirection={3}
+                name={'test'}
+                enemyColor={'blue'}
 
+            />
 
             {/* Lights */}
             <pointLight intensity={40} position={[0, 5, 7]} castShadow receiveShadow />
