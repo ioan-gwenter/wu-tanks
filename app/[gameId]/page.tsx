@@ -1,6 +1,6 @@
-import { GameScene } from "@/components/game/GameScene";
-import { InvalidGame } from "@/components/game/InvalidGame";
-import { isValidGameId } from "../_routing/helper";
+import { GameScene } from "@/components/game/scenes/GameScene";
+import { InvalidGame } from "@/components/game/scenes/InvalidGame";
+import { isValidGameId } from "../util/landingPageHelper";
 
 
 export default async function GamePage({

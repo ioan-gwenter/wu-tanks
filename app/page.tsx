@@ -1,11 +1,11 @@
 "use client"
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
-import { validateCreateGame, validateJoinGame } from './_routing/helper';
+import { validateCreateGame, validateJoinGame } from './util/landingPageHelper';
 import { useRouter } from "next/navigation";
 
 const InputWithButton = dynamic(() => import('@/components/ui/InputWithButton').then((mod) => mod.default), { ssr: false });
-const MenuTank = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.MenuTank), { ssr: false })
+const MenuTank = dynamic(() => import('@/components/canvas/MenuTank').then((mod) => mod.MenuTank), { ssr: false })
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
   loading: () => (
