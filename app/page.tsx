@@ -1,7 +1,8 @@
 "use client"
 import dynamic from 'next/dynamic'
-import { flattenJSON } from 'three/src/animation/AnimationUtils'
 import { Suspense } from 'react'
+import { validateCreateGame, validateJoinGame } from './_routing/helper';
+import { useRouter } from "next/navigation";
 
 const InputWithButton = dynamic(() => import('@/components/ui/InputWithButton').then((mod) => mod.default), { ssr: false });
 const MenuTank = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.MenuTank), { ssr: false })
@@ -23,16 +24,27 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
 
-const handleNewGame = () => {
-  console.log('Creating a new game...');
-};
-
-const handleJoinGame = () => {
-  console.log('Join a new game...');
-};
-
-
 export default function Page() {
+  const router = useRouter();
+
+  const handleJoinGame = async (gameId: string) => {
+    try {
+      const redirect = await validateJoinGame(gameId);
+      router.push(redirect);
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleCreateGame = async () => {
+    try {
+      const redirect = await validateCreateGame();
+      router.push(redirect);
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
   return (
     <>
       <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center bg-gray-100 overflow-hidden">
@@ -64,8 +76,8 @@ export default function Page() {
             or
           </p>
           <button
-            onClick={handleNewGame}
-            className="rounded-md bg-gray-700 px-5 py-3 md:px-6 md:py-3 lg:px-8 lg:py-4 text-sm md:text-base lg:text-lg text-white shadow-md hover:bg-gray-800  transition-transform transform hover:scale-105"
+            onClick={handleCreateGame}
+            className="rounded-md bg-green-700 px-5 py-3 md:px-6 md:py-3 lg:px-8 lg:py-4 text-sm md:text-base lg:text-lg text-white shadow-md hover:bg-gray-800  transition-transform transform hover:scale-105"
           >
             New Game
           </button>

@@ -1,6 +1,6 @@
 import { GameScene } from "@/components/game/GameScene";
 import { InvalidGame } from "@/components/game/InvalidGame";
-import { isValidGameId } from "./helper";
+import { isValidGameId } from "../_routing/helper";
 
 
 export default async function GamePage({
