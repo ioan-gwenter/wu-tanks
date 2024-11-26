@@ -17,3 +17,35 @@
     overflow: hidden;
   }
 }
+
+@layer components {
+  .button-dark {
+    background-image: radial-gradient(circle 975px at 2.6% 48.3%,
+        rgba(0, 8, 120, 1) 0%,
+        rgba(95, 184, 224, 1) 99.7%);
+  }
+
+  .button-light {
+    background-image: linear-gradient(174.2deg,
+        rgba(255, 244, 228, 1) 7.1%,
+        rgba(240, 246, 238, 1) 67.4%);
+  }
+
+}
+
+@keyframes zoom {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.5);
+  }
+}
+
+
+@media (max-width: 600px) {
+  .fix-ios {
+    bottom: 120px !important;
+  }
+}
