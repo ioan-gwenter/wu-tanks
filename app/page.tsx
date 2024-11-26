@@ -1,7 +1,8 @@
-'use client'
-
 import dynamic from 'next/dynamic'
+import { flattenJSON } from 'three/src/animation/AnimationUtils'
+import { Suspense } from 'react'
 
+const MenuTank = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.MenuTank), { ssr: false })
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
   loading: () => (
@@ -25,9 +26,12 @@ export default function Page() {
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
         {/* jumbo */}
         <div className='flex w-full flex-col items-start justify-center p-12 text-center md:w-2/5 md:text-left'>
-          <p className='w-full uppercase'>Wu Tanks</p>
           <h1 className='my-4 text-5xl font-bold leading-tight'>Wu tanks</h1>
         </div>
+        <View className='flex h-96 w-full flex-col items-center justify-center'>
+          <MenuTank scale={10} position={[0, -1, 1]} />
+          <Common />
+        </View>
       </div>
     </>
   )
