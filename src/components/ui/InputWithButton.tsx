@@ -25,7 +25,7 @@ const InputWithButton: React.FC<InputWithButtonProps> = ({ onSubmit, placeholder
             />
             <button
                 onClick={handleSubmit}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-white shadow-md hover:bg-indigo-700"
+                className="rounded-md bg-indigo-600 px-4 py-2 text-white shadow-md hover:bg-indigo-700 transition-transform transform hover:scale-105"
             >
                 {buttonText}
             </button>

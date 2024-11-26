@@ -38,10 +38,10 @@ export default function Page() {
       <div className="h-screen w-screen flex flex-col md:flex-row items-center justify-center bg-gray-100 overflow-hidden">
         {/* Left side: Tank view */}
         <div className="flex h-1/2 w-full md:h-full md:w-1/2 items-center justify-center">
-          <div className="flex h-4/5 w-4/5 items-center justify-center">
+          <div className="flex h-4/5 w-full items-center justify-center">
             <View className="flex h-full w-full items-center justify-center">
               <Suspense fallback={null}>
-                <MenuTank scale={8} position={[0, -1, 0.5]} />
+                <MenuTank scale={8} position={[0, -0.4, -1]} />
                 <Common />
               </Suspense>
             </View>
@@ -65,7 +65,7 @@ export default function Page() {
           </p>
           <button
             onClick={handleNewGame}
-            className="rounded-md bg-gray-700 px-5 py-3 md:px-6 md:py-3 lg:px-8 lg:py-4 text-sm md:text-base lg:text-lg text-white shadow-md hover:bg-gray-800"
+            className="rounded-md bg-gray-700 px-5 py-3 md:px-6 md:py-3 lg:px-8 lg:py-4 text-sm md:text-base lg:text-lg text-white shadow-md hover:bg-gray-800  transition-transform transform hover:scale-105"
           >
             New Game
           </button>
