@@ -1,9 +1,10 @@
 import type * as Party from "partykit/server";
-import GameServer from "party";
-import createRoomAction from "party/actions/createRoomAction";
+import BrowserServer from "party/browserserver/browserserver";
+import { createRoomAction } from "../actions/createRoomAction";
+
 
 export async function handleRequest(
-    server: GameServer, //Game Server Instance
+    server: BrowserServer, //Game Server Instance
     request: Party.Request
 
 ): Promise<Response> {
@@ -18,7 +19,7 @@ export async function handleRequest(
             }
 
             switch (body.action) {
-                case "createRoom":
+                case "CREATE_ROOM_REQUEST":
                     return createRoomAction(server);
                 default:
                     return new Response(`Unknown action: ${body.action}`, { status: 400 });

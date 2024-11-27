@@ -5,6 +5,7 @@ import { MenuTank } from "../canvas/MenuTank";
 import LobbyScene from "./scenes/LobbyScene";
 import { Joystick } from "react-joystick-component";
 import GameScene from "./scenes/GameScene";
+import { usePartySocket } from "partysocket/react";
 
 enum SessionState {
     AWAIT_START = 'AWAIT_START',
@@ -23,14 +24,16 @@ enum Scenes {
 
 // Map SceneState to Scene Objects
 const SceneMap = {
-    [Scenes.LOADING]: () => <p>Loading...</p>,
+    [Scenes.LOADING]: MenuTank, //Placeholder for loading menu
     [Scenes.LOBBY]: LobbyScene,
     [Scenes.GAME]: GameScene,
-    [Scenes.GAME_OVER]: () => <p>Game Over</p>,
+    [Scenes.GAME_OVER]: MenuTank,
 };
 
 
 export function SessionManager({ gameId }: { gameId: string }) {
+
+    // Connect to the game server
 
     // Session State Machine Management
     const [sessionState, setSessionState] = useState<SessionState>(SessionState.AWAIT_START);
@@ -38,8 +41,30 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
     // Scene Display Management
     const [isLoading, setLoading] = useState<boolean | null>(null);
-    const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOBBY);
+    const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOADING);
     const CurrentSceneComponent = SceneMap[currentScene];
+
+    const sessionSocket = usePartySocket({
+        host: "localhost:1999",
+        room: gameId,
+        party: "gameserver",
+        onMessage(event) {
+            const dataReceived = JSON.parse(event.data);
+            console.log("Received message:", dataReceived);
+
+            const { type, ...payload } = dataReceived;
+
+            switch (type) {
+                case "AWAIT_START":
+                    setCurrentScene(Scenes.LOBBY);
+
+                default:
+                    console.warn("Unknown message type:", type);
+                    break;
+
+            }
+        }
+    });
 
     return (
         <div className="relative h-screen w-screen">
