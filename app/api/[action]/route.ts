@@ -23,7 +23,7 @@ export async function POST(req: Request, { params }: { params: { action: string 
     // Request to create a new room
     if (action === "create") {
         try {
-            const res = await fetch(`http://0.0.0.0:1999/party/create`, {
+            const res = await fetch(`http://0.0.0.0:1999/party/browserserver`, {
                 method: "POST",
                 body: JSON.stringify({ action: "CREATE_ROOM_REQUEST" }),
                 headers: {

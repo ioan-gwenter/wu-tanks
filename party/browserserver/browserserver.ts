@@ -4,7 +4,9 @@ import { handleRequest } from "./handlers/onRequestHandler";
 export default class BrowserServer implements Party.Server {
   activeGameIds: Set<string> = new Set<string>();
 
-  constructor(readonly room: Party.Room) { }
+  constructor(readonly room: Party.Room) {
+    console.log(this.room.id)
+  }
 
   // Initialize the activeGameIds from persistent storage
   async onStart() {
@@ -48,6 +50,7 @@ export default class BrowserServer implements Party.Server {
   // REMOVE GAME ID
   removeGameId(gameId: string): boolean {
     const removed = this.activeGameIds.delete(gameId);
+    console.log('removed game id: ', gameId)
     if (removed) {
       this.saveActiveGameIds();
     }

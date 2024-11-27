@@ -1,6 +1,7 @@
 import type * as Party from "partykit/server";
 import BrowserServer from "party/browserserver/browserserver";
 import { createRoomAction } from "../actions/createRoomAction";
+import { deactivateRoomAction } from "../actions/deactivateRoomAction";
 
 
 export async function handleRequest(
@@ -21,6 +22,8 @@ export async function handleRequest(
             switch (body.action) {
                 case "CREATE_ROOM_REQUEST":
                     return createRoomAction(server);
+                case "DEACTIVATE_ROOM_REQUEST":
+                    return deactivateRoomAction(server, body.data);
                 default:
                     return new Response(`Unknown action: ${body.action}`, { status: 400 });
             }

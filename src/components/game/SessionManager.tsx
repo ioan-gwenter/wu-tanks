@@ -8,7 +8,9 @@ import GameScene from "./scenes/GameScene";
 import { usePartySocket } from "partysocket/react";
 
 enum SessionState {
+    LOADING = 'LOADING',
     AWAIT_START = 'AWAIT_START',
+    GAME_START = 'GAME_START',
     ROUND_START = 'ROUND_START',
     ROUND_END = 'ROUND_END',
     NEXT_ROUND = 'NEXT_ROUND',
@@ -34,9 +36,10 @@ const SceneMap = {
 export function SessionManager({ gameId }: { gameId: string }) {
 
     // Connect to the game server
+    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
     // Session State Machine Management
-    const [sessionState, setSessionState] = useState<SessionState>(SessionState.AWAIT_START);
+    const [sessionState, setSessionState] = useState<SessionState>(SessionState.LOADING);
     const [roundNum, setCurrentRoundNum] = useState<number>(-1);
 
     // Scene Display Management
@@ -56,7 +59,14 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
             switch (type) {
                 case "AWAIT_START":
+                    setSessionState(SessionState.AWAIT_START)
                     setCurrentScene(Scenes.LOBBY);
+                    break;
+
+                case "GAME_START":
+                    setSessionState(SessionState.GAME_START)
+                    setCurrentScene(Scenes.GAME);
+                    break;
 
                 default:
                     console.warn("Unknown message type:", type);
@@ -72,7 +82,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
             <div className="absolute inset-0 z-10 pointer-events-none flex items-start justify-center">
                 <div className="pointer-events-auto p-4">
                     {/* UI content */}
-                    <p className="text-white text-3xl">SESSION STATE: {sessionState}</p>
+                    <p className="text-black text-3xl">SESSION STATE: {sessionState}</p>
 
                     <div className="fix-ios" style={{ position: "absolute", bottom: "3vh", left: "3vw" }}>
                         <Joystick
