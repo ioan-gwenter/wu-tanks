@@ -1,7 +1,7 @@
 "use client"
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
-import { validateCreateGame, validateJoinGame } from './util/landingPageHelper';
+import { isValidGameId, validateCreateGame, validateJoinGame } from './util/landingPageHelper';
 import { useRouter } from "next/navigation";
 import LobbyScene from '@/components/game/scenes/LobbyScene';
 
@@ -29,13 +29,11 @@ export default function Page() {
   const router = useRouter();
 
   const handleJoinGame = async (gameId: string) => {
-    try {
-      const redirect = await validateJoinGame(gameId);
-      router.push(redirect);
-    } catch (error: any) {
-      alert(error.message);
+    if (!isValidGameId(gameId)) {
+      alert("Please Enter A Valid Game Id"); //TODO Make error nicer
     }
-  };
+    router.push(`/${gameId}`);
+  }
 
   const handleCreateGame = async () => {
     try {

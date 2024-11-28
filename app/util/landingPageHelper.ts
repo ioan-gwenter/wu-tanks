@@ -3,31 +3,32 @@ export function isValidGameId(gameId: string) {
     const regex = /^[a-zA-Z0-9]{8}$/;
     return regex.test(gameId);
 }
+// Move this to game page element
 
-export const validateJoinGame = async (gameId: string): Promise<string | Error> => {
-    console.log("join pressed")
-    if (!gameId.trim()) {
-        throw new Error("Please enter a valid Game ID.");
-    }
+// export const validateJoinGame = async (gameId: string): Promise<string | Error> => {
+//     console.log("join pressed")
+//     if (!isValidGameId(gameId)) {
+//         throw new Error("Please enter a valid Game ID.");
+//     }
 
-    try {
-        const response = await fetch("/api/join", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ gameId }),
-        });
+//     try {
+//         const response = await fetch("/api/join", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ gameId }),
+//         });
 
-        if (!response.ok) {
-            const { error } = await response.json();
-            throw new Error(error || "An error occurred while joining the game.");
-        }
+//         if (!response.ok) {
+//             const { error } = await response.json();
+//             throw new Error(error || "An error occurred while joining the game.");
+//         }
 
-        const { redirect } = await response.json();
-        return redirect;
-    } catch (error) {
-        throw new Error(error.message || "An unexpected Join error occurred.");
-    }
-};
+//         const { redirect } = await response.json();
+//         return redirect;
+//     } catch (error) {
+//         throw new Error(error.message || "An unexpected Join error occurred.");
+//     }
+// };
 
 export const validateCreateGame = async (): Promise<string | Error> => {
     console.log("create pressed")

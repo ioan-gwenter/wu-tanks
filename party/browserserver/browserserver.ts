@@ -5,20 +5,15 @@ export default class BrowserServer implements Party.Server {
   activeGameIds: Set<string> = new Set<string>();
 
   constructor(readonly room: Party.Room) {
-    console.log(this.room.id)
   }
 
   // Initialize the activeGameIds from persistent storage
   async onStart() {
+    console.log("Browser Server Started")
+    await this.room.storage.put("isServerActive", "yes");
     const storedIds = await this.room.storage.get<string[]>("activeGameIds");
     this.activeGameIds = new Set(storedIds ?? []);
     console.log(`Loaded active game IDs: ${Array.from(this.activeGameIds)}`);
-  }
-
-  // Persist the activeGameIds to storage
-  private async saveActiveGameIds() {
-    await this.room.storage.put("activeGameIds", Array.from(this.activeGameIds));
-    console.log(`Saved active game IDs: ${Array.from(this.activeGameIds)}`);
   }
 
   // HANDLE SOCKET CONNECTIONS
@@ -37,6 +32,12 @@ export default class BrowserServer implements Party.Server {
     return handleRequest(this, request);
   }
 
+  // Persist the activeGameIds to storage
+  private async saveActiveGameIds() {
+    await this.room.storage.put("activeGameIds", Array.from(this.activeGameIds));
+    console.log(`Saved active game IDs: ${Array.from(this.activeGameIds)}`); // Debug
+  }
+
   // ADD GAME ID
   addGameId(gameId: string): boolean {
     if (this.activeGameIds.has(gameId)) {
@@ -50,7 +51,7 @@ export default class BrowserServer implements Party.Server {
   // REMOVE GAME ID
   removeGameId(gameId: string): boolean {
     const removed = this.activeGameIds.delete(gameId);
-    console.log('removed game id: ', gameId)
+    // console.log('removed game id: ', gameId) // Debug
     if (removed) {
       this.saveActiveGameIds();
     }

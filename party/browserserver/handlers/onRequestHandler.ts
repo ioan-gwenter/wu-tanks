@@ -2,6 +2,7 @@ import type * as Party from "partykit/server";
 import BrowserServer from "party/browserserver/browserserver";
 import { createRoomAction } from "../actions/createRoomAction";
 import { deactivateRoomAction } from "../actions/deactivateRoomAction";
+import { joinRoomAction } from "../actions/joinRoomRequest";
 
 
 export async function handleRequest(
@@ -11,6 +12,9 @@ export async function handleRequest(
 ): Promise<Response> {
 
     // POST REQUESTS
+
+    // console.log(`A request was recieved on ${server.room.internalID}!`); // DEBUG
+
     if (request.method === "POST") {
         try {
             const body: { action: string; data?: {} } = await request.json();
@@ -24,6 +28,8 @@ export async function handleRequest(
                     return createRoomAction(server);
                 case "DEACTIVATE_ROOM_REQUEST":
                     return deactivateRoomAction(server, body.data);
+                case "JOIN_ROOM_REQUEST":
+                    return joinRoomAction(server, body.data)
                 default:
                     return new Response(`Unknown action: ${body.action}`, { status: 400 });
             }

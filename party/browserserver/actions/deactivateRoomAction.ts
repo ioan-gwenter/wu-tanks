@@ -9,11 +9,10 @@ export async function deactivateRoomAction(server: BrowserServer, data: any): Pr
 
         const gameId = data.gameId;
 
-        console.log(gameId)
-
-
         if (server.removeGameId(gameId)) {
+            console.log(`BrowserServer: Succesfully removed room ${gameId}`)
             return new Response(`Room '${gameId}' deactivated successfully`, { status: 200 });
+
         } else {
             return new Response(`Room '${gameId}' does not exist or is not active`, { status: 404 });
         }

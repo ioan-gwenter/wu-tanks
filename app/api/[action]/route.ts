@@ -1,23 +1,42 @@
 import { PARTYKIT_URL } from "@/env";
 import { NextResponse } from "next/server";
 
-const generateRandomGameId = (): string => {
-    return Math.random().toString(36).substring(2, 10);
-};
-
-
 export async function POST(req: Request, { params }: { params: { action: string } }) {
     const { action } = params;
-    const body = await req.json();
 
+
+    // HANDLE JOINING
     if (action === "join") {
-        const { gameId } = body;
+        try {
+            const { gameId } = await req.json();
 
-        if (!gameId || gameId.trim() === "") {
-            return NextResponse.json({ error: "Invalid Game ID" }, { status: 400 });
+            if (!gameId?.trim()) {
+                return NextResponse.json({ error: "Invalid Game ID" }, { status: 400 });
+            }
+
+            const res = await fetch(`http://localhost:1999/party/browserserver`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "JOIN_ROOM_REQUEST", data: { gameId } }),
+            });
+
+            if (!res.ok) {
+                if (res.status === 404) {
+                    console.log("No Room Found!");
+                    return NextResponse.json({ roomExists: false });
+                }
+                const errorText = await res.text();
+                console.error(`Server error: ${res.status} - ${errorText}`);
+                return NextResponse.json({ error: "Failed to join room. Please try again." }, { status: res.status });
+            }
+
+            console.log("Valid Room Code Found!");
+            return NextResponse.json({ roomExists: true });
+
+        } catch (error) {
+            console.error("Error joining room:", error);
+            return NextResponse.json({ error: "An unexpected error occurred. Please try again." }, { status: 500 });
         }
-
-        return NextResponse.json({ redirect: `/${gameId}` });
     }
 
     // Request to create a new room

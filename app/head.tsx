@@ -9,6 +9,7 @@ export default function Head() {
     <>
       {/* Recommended Meta Tags */}
       <meta charSet='utf-8' />
+      <link rel="icon" href="/icons/favicon.ico" />
       <meta name='language' content='english' />
       <meta httpEquiv='content-type' content='text/html' />
       <meta name='author' content={author} />
