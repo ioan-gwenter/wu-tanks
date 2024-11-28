@@ -33,12 +33,14 @@ export default function Page() {
       alert("Please Enter A Valid Game Id"); //TODO Make error nicer
     }
     router.push(`/${gameId}`);
+    router.refresh();
   }
 
   const handleCreateGame = async () => {
     try {
       const redirect = await validateCreateGame();
       router.push(redirect);
+      router.refresh();
     } catch (error: any) {
       alert(error.message);
     }

@@ -23,15 +23,32 @@ export async function POST(req: Request, { params }: { params: { action: string 
             if (!res.ok) {
                 if (res.status === 404) {
                     console.log("No Room Found!");
-                    return NextResponse.json({ roomExists: false });
+                    return NextResponse.json({ roomExists: false }, {
+                        status: res.status,
+                        headers: {
+                            "Cache-Control": "no-store, max-age=0",
+                        },
+                    });
                 }
                 const errorText = await res.text();
                 console.error(`Server error: ${res.status} - ${errorText}`);
-                return NextResponse.json({ error: "Failed to join room. Please try again." }, { status: res.status });
+                return NextResponse.json(
+                    { error: "Failed to join room. Please try again." },
+                    {
+                        status: res.status,
+                        headers: {
+                            "Cache-Control": "no-store, max-age=0",
+                        },
+                    });
             }
 
             console.log("Valid Room Code Found!");
-            return NextResponse.json({ roomExists: true });
+            return NextResponse.json({ roomExists: true }, {
+                status: res.status,
+                headers: {
+                    "Cache-Control": "no-store, max-age=0",
+                },
+            });
 
         } catch (error) {
             console.error("Error joining room:", error);

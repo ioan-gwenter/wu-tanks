@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { InvalidGame } from "@/components/game/scenes/InvalidGame";
 import { SessionManager } from "@/components/game/SessionManager";
 
@@ -29,6 +31,7 @@ export default async function GamePage({
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ gameId }),
+            cache: "no-store",
         });
 
         if (!res.ok) {
