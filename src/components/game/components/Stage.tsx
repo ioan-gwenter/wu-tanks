@@ -20,7 +20,7 @@ export function Stage(props: JSX.IntrinsicElements['group']) {
     return (
         <group {...props} dispose={null}>
             <group name="Scene">
-                <group name="Scene_1" rotation={[0, 0, 0]} scale={[3.901, 1.67, 3.83]}>
+                <group name="Scene_1" rotation={[0, 0, 0]} scale={[3.901, 1.67, 4.02]}>
                     <mesh
                         name="Scene_2"
                         castShadow

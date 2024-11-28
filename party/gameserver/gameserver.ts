@@ -2,7 +2,7 @@ import type * as Party from "partykit/server";
 import { handleRequest } from "./handlers/onRequestHandler";
 
 
-const EXPIRY_PERIOD_MILLISECONDS = 10 * 1000; //How long a room should be active for
+const EXPIRY_PERIOD_MILLISECONDS = 10 * 60 * 1000; //How long a room should be active for
 
 
 export default class GameServer implements Party.Server {

@@ -4,51 +4,19 @@ import { OrbitControls, OrthographicCamera, PerspectiveCamera } from '@react-thr
 import { Stage } from '../components/Stage';
 import { EnemyTank } from '../components/EnemyTank';
 import { PlayerTankHandler } from '../components/PlayerTankHandler';
+import DefaultBackdrop from '../components/DefaultBackdrop';
+
 
 
 export default function LobbyScene() {
     return (
         <>
+            <DefaultBackdrop />
+            <PlayerTankHandler position={[0, 0, 0]} />
+            <PlayerTankHandler position={[0, 0, 0.17 * -9]} />
+            <PlayerTankHandler position={[0.17 * -11, 0, 0.17 * -9]} />
+            <EnemyTank position={[0, 0, -1.45]} />
 
-            <OrthographicCamera
-                makeDefault
-                position={[0, 5, 5]}
-                rotation={[-Math.PI / 4, 0, 0]}
-                zoom={230}
-            />
-            <OrbitControls />
-            {/* Stage */}
-            <Stage position={[0.1, -0.07, -0.7]} />
-
-            <PlayerTankHandler
-                position={[0, 0, 0]}
-                bodyDirection={1}
-                headDirection={3}
-                isLocalPlayer={false}
-                name={'test'}
-                playerColor={'blue'}
-            />
-
-            <EnemyTank
-                position={[1, 0, 0]}
-                bodyDirection={1}
-                headDirection={3}
-                name={'test'}
-                enemyColor={'blue'}
-
-            />
-
-            {/* Lights */}
-            <pointLight intensity={40} position={[0, 5, 7]} castShadow receiveShadow />
-            <ambientLight intensity={0.2} castShadow />
-            <spotLight
-                position={[0, 10, 0]}
-                angle={0.7}
-                penumbra={1}
-                intensity={200}
-                castShadow
-                receiveShadow
-            />
 
 
         </>

@@ -1,9 +1,8 @@
 "use client"
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
-import { isValidGameId, validateCreateGame, validateJoinGame } from './util/landingPageHelper';
+import { isValidGameId, validateCreateGame } from './util/landingPageHelper';
 import { useRouter } from "next/navigation";
-import LobbyScene from '@/components/game/scenes/LobbyScene';
 
 const InputWithButton = dynamic(() => import('@/components/ui/InputWithButton').then((mod) => mod.default), { ssr: false });
 const MenuTank = dynamic(() => import('@/components/canvas/MenuTank').then((mod) => mod.MenuTank), { ssr: false })
@@ -22,6 +21,8 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
     </div>
   ),
 })
+
+
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
 
