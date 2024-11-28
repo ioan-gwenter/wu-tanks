@@ -36,14 +36,11 @@ const SceneMap = {
 export function SessionManager({ gameId }: { gameId: string }) {
 
     // Connect to the game server
-    const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
     // Session State Machine Management
     const [sessionState, setSessionState] = useState<SessionState>(SessionState.LOADING);
-    const [roundNum, setCurrentRoundNum] = useState<number>(-1);
 
     // Scene Display Management
-    const [isLoading, setLoading] = useState<boolean | null>(null);
     const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOADING);
     const CurrentSceneComponent = SceneMap[currentScene];
 
@@ -51,6 +48,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
         host: "localhost:1999",
         room: gameId,
         party: "gameserver",
+
         onMessage(event) {
             const dataReceived = JSON.parse(event.data);
             console.log("Received message:", dataReceived);

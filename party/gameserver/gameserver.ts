@@ -2,12 +2,14 @@ import type * as Party from "partykit/server";
 import { handleRequest } from "./handlers/onRequestHandler";
 
 
-const EXPIRY_PERIOD_MILLISECONDS = 10 * 60 * 1000; //How long a room should be active for
+const EXPIRY_PERIOD_MILLISECONDS: number = 10 * 60 * 1000; //How long a room should be active for
 
+const TPS: number = 10;
 
 export default class GameServer implements Party.Server {
     roomId: string;
 
+    interval: ReturnType<typeof setInterval> | undefined;
     constructor(readonly room: Party.Room, roomId: string) {
         roomId = this.room.id.toString()
     }
@@ -19,6 +21,11 @@ export default class GameServer implements Party.Server {
             await this.room.storage.put<string>("id", this.room.id);
         }
         this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS); //start the expiry alarm
+
+        //Server Game Loop
+        this.interval = setInterval(() => {
+
+        }, Math.floor(1000 / TPS));
     }
 
     // HANDLE SOCKET CONNECTIONS
@@ -34,7 +41,7 @@ export default class GameServer implements Party.Server {
     async onMessage(message: string, sender: Party.Connection) {
         console.log(`connection ${sender.id} sent message: ${message}`);
         this.room.broadcast(`${sender.id}: ${message}`, [sender.id]);
-        await this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS); // Update the rooms expiry period
+        await this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS);
     }
 
     // HTTP REQUESTS
