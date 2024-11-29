@@ -6,6 +6,8 @@ import LobbyScene from "./scenes/LobbyScene";
 import { Joystick } from "react-joystick-component";
 import GameScene from "./scenes/GameScene";
 import { usePartySocket } from "partysocket/react";
+import { Vector2 } from "three";
+import { pressedKeysToVector, usePressedKeys } from "./input/input";
 
 enum SessionState {
     LOADING = 'LOADING',
@@ -44,6 +46,19 @@ export function SessionManager({ gameId }: { gameId: string }) {
     const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOADING);
     const CurrentSceneComponent = SceneMap[currentScene];
 
+    //Input
+
+    const [joystickDirection, setJoystickDirection] = useState<Vector2>(
+        new Vector2(0, 0)
+    );
+
+    const pressedKeys = usePressedKeys();
+
+    const inputDirection = pressedKeys.size
+        ? pressedKeysToVector(pressedKeys)
+        : joystickDirection;
+
+
     const sessionSocket = usePartySocket({
         host: "localhost:1999",
         room: gameId,
@@ -72,6 +87,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
             }
         }
+
     });
 
     return (
@@ -88,6 +104,9 @@ export function SessionManager({ gameId }: { gameId: string }) {
                             sticky={false}
                             baseColor="white"
                             stickColor="grey"
+                            start={() => setJoystickDirection(new Vector2(0, 0))}
+                            move={(e) => setJoystickDirection(new Vector2(e.x!, -e.y!))}
+                            stop={() => setJoystickDirection(new Vector2(0, 0))}
                         />
                     </div>
 

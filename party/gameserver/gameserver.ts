@@ -6,14 +6,20 @@ const EXPIRY_PERIOD_MILLISECONDS: number = 10 * 60 * 1000; //How long a room sho
 
 const TPS: number = 10;
 
+type gameState = {
+    tanks: Array<{ id: string; position: [number, number], rotation: [number, number] }>;
+    bullets: Array<{ id: string; position: [number, number], rotation: [number], bounces: number }>;
+    mines: Array<{ id: string; position: [number, number] }>;
+}
+
+
 export default class GameServer implements Party.Server {
     roomId: string;
-
     interval: ReturnType<typeof setInterval> | undefined;
+
     constructor(readonly room: Party.Room, roomId: string) {
         roomId = this.room.id.toString()
     }
-
 
     async onStart() {
         if (this.room.id) {
@@ -49,7 +55,7 @@ export default class GameServer implements Party.Server {
         return handleRequest(this, request);
     }
 
-
+    // Alarm used for deactivating room when inactivity
     async onAlarm(): Promise<void> {
         const id = await this.room.storage.get<string>("id");
 
