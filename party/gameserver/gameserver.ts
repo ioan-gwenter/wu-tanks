@@ -1,8 +1,9 @@
 import type * as Party from "partykit/server";
 import { handleRequest } from "./handlers/onRequestHandler";
+import { createMessage } from "./messaging/messageTypes";
 
 
-const EXPIRY_PERIOD_MILLISECONDS: number = 10 * 60 * 1000; //How long a room should be active for
+const EXPIRY_PERIOD_MILLISECONDS: number = 1 * 60 * 1000; //How long a room should be active for
 
 const TPS: number = 10;
 
@@ -16,9 +17,15 @@ type gameState = {
 export default class GameServer implements Party.Server {
     roomId: string;
     interval: ReturnType<typeof setInterval> | undefined;
+    gameState: gameState = {
+        tanks: [],
+        bullets: [],
+        mines: []
+    }
 
     constructor(readonly room: Party.Room, roomId: string) {
         roomId = this.room.id.toString()
+
     }
 
     async onStart() {
@@ -36,11 +43,10 @@ export default class GameServer implements Party.Server {
 
     // HANDLE SOCKET CONNECTIONS
     async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
-        conn.send(JSON.stringify(
-            {
-                "type": "AWAIT_START",
-
-            }));
+        conn.send(JSON.stringify(createMessage("sessionStateUpdate", {
+            scene: "LOBBY",
+            state: "AWAIT_START",
+        })));
     }
 
     // SERVER MESSAGES

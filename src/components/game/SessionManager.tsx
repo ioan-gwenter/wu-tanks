@@ -8,25 +8,10 @@ import GameScene from "./scenes/GameScene";
 import { usePartySocket } from "partysocket/react";
 import { Vector2 } from "three";
 import { pressedKeysToVector, useMousePosition, usePressedKeys } from "./input/input";
-import JoystickComponent from "./input/joystickComp";
-import { isMobileDevice } from "@/helpers/isMobileDevice";
+import { GameState, RoomState, Scenes, SessionState } from "./gameTypes";
+// import { isMobileDevice } from "@/helpers/isMobileDevice";
 
-enum SessionState {
-    LOADING = 'LOADING',
-    AWAIT_START = 'AWAIT_START',
-    GAME_START = 'GAME_START',
-    ROUND_START = 'ROUND_START',
-    ROUND_END = 'ROUND_END',
-    NEXT_ROUND = 'NEXT_ROUND',
-    GAME_OVER = 'GAME_OVER'
-}
 
-enum Scenes {
-    LOADING = "LOADING",
-    LOBBY = "LOBBY",
-    GAME = "GAME",
-    GAME_OVER = "GAME_OVER"
-}
 
 // Map SceneState to Scene Objects
 const SceneMap = {
@@ -37,16 +22,47 @@ const SceneMap = {
 };
 
 
+
+
 export function SessionManager({ gameId }: { gameId: string }) {
+
+    const getSceneProps = (scene) => {
+        switch (scene) {
+            case Scenes.LOADING:
+                return {};
+            case Scenes.LOBBY:
+                return { gameState: sessionState.gameState };
+            case Scenes.GAME:
+                return {};
+            case Scenes.GAME_OVER:
+                return {};
+            default:
+                return {};
+        }
+    };
 
     // Connect to the game server
 
     // Session State Machine Management
-    const [sessionState, setSessionState] = useState<SessionState>(SessionState.LOADING);
+    const [sessionState, setSessionState] = useState<SessionState>({
+        roomState: RoomState.LOADING,
+        currentScene: Scenes.LOADING,
+        roundNumber: 1,
+        currentMap: "default_map",
+        gameState: {
+            tanks: [],
+            bullets: [],
+            mines: [],
+        },
+    });
 
     // Scene Display Management
     const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOADING);
-    const CurrentSceneComponent = SceneMap[currentScene];
+    const CurrentSceneComponent = ({ currentScene }) => {
+        const SceneComponent = SceneMap[currentScene]; // Get the mapped component
+        const sceneProps = getSceneProps(currentScene); // Get the corresponding props
+        return SceneComponent ? <SceneComponent {...sceneProps} /> : null; // Render with props
+    };
 
     const [isMobile, setIsMobile] = useState(false);
 
@@ -67,9 +83,9 @@ export function SessionManager({ gameId }: { gameId: string }) {
         ? pressedKeysToVector(pressedKeys)
         : joystickDirection;
 
-    useEffect(() => {
-        setIsMobile(isMobileDevice());
-    }, []);
+    // useEffect(() => {
+    //     setIsMobile(isMobileDevice());
+    // }, []);
 
 
     const sessionSocket = usePartySocket({
@@ -81,18 +97,16 @@ export function SessionManager({ gameId }: { gameId: string }) {
             const dataReceived = JSON.parse(event.data);
             console.log("Received message:", dataReceived);
 
-            const { type, ...payload } = dataReceived;
+            const { type, payload } = dataReceived;
 
             switch (type) {
-                case "AWAIT_START":
-                    setSessionState(SessionState.AWAIT_START)
-                    setCurrentScene(Scenes.LOBBY);
-                    break;
-
-                case "GAME_START":
-                    setSessionState(SessionState.GAME_START)
-                    setCurrentScene(Scenes.GAME);
-                    break;
+                case "sessionStateUpdate":
+                    setSessionState((prevState) => ({
+                        ...prevState,
+                        roomState: payload.state,
+                        currentScene: payload.scene,
+                    }));
+                    setCurrentScene(payload.scene)
 
                 default:
                     console.warn("Unknown message type:", type);
@@ -109,7 +123,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
             <div className="absolute inset-0 z-10 pointer-events-none flex items-start justify-center">
                 <div className="pointer-events-auto p-4">
                     {/* UI content */}
-                    <p className="text-black text-3xl">SESSION STATE: {sessionState}</p>
+                    <p className="text-black text-3xl">SESSION STATE: {sessionState.roomState}</p>
 
                     <div className="fix-ios" style={{ position: "absolute", bottom: "3vh", left: "3vw" }}>
                         {isMobile && (
@@ -131,7 +145,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
             {/* 3D View Div */}
             <View className="absolute inset-0 z-0">
                 <Suspense fallback={null}>
-                    <CurrentSceneComponent />
+                    <CurrentSceneComponent currentScene={currentScene} />
                 </Suspense>
             </View>
         </div>

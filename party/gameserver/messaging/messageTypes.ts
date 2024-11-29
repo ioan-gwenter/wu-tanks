@@ -27,6 +27,6 @@ type SessionStateUpdateMessage = Message<"sessionStateUpdate", SessionStatePaylo
 type GameStateUpdateMessage = Message<"gameStateUpdate", GameStatePayload>;
 
 // Utility Functions
-function createMessage<T extends MessageType, P>(type: T, payload: P): Message<T, P> {
+export function createMessage<T extends MessageType, P>(type: T, payload: P): Message<T, P> {
     return { type, payload };
 }

@@ -5,20 +5,20 @@ import { PlayerTank } from "./PlayerTank";
 export const PlayerTankHandler = forwardRef<
     Group | null,
     {
-        bodyDirection?: number;
-        headDirection?: number;
+        bodyRotation?: number;
+        headRotation?: number;
         position?: [number, number, number];
         isLocalPlayer?: boolean;
         name?: string;
         playerColor?: string;
     }
 >(function PlayerTankHandler(
-    { bodyDirection, headDirection, position, isLocalPlayer, name, playerColor },
+    { bodyRotation, headRotation, position, isLocalPlayer, name, playerColor },
     ref
 ) {
     return (
         <group ref={ref} position={position} >
-            <PlayerTank bodyDirection={bodyDirection} headDirection={headDirection} position={position} playerColor={playerColor} />
+            <PlayerTank bodyRotation={bodyRotation} headRotation={headRotation} position={position} playerColor={playerColor} />
         </group>
     );
 });
