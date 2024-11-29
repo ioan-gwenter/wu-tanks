@@ -1,5 +1,5 @@
 "use client"
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Common, View } from "../canvas/View";
 import { MenuTank } from "../canvas/MenuTank";
 import LobbyScene from "./scenes/LobbyScene";
@@ -7,7 +7,9 @@ import { Joystick } from "react-joystick-component";
 import GameScene from "./scenes/GameScene";
 import { usePartySocket } from "partysocket/react";
 import { Vector2 } from "three";
-import { pressedKeysToVector, usePressedKeys } from "./input/input";
+import { pressedKeysToVector, useMousePosition, usePressedKeys } from "./input/input";
+import JoystickComponent from "./input/joystickComp";
+import { isMobileDevice } from "@/helpers/isMobileDevice";
 
 enum SessionState {
     LOADING = 'LOADING',
@@ -46,17 +48,28 @@ export function SessionManager({ gameId }: { gameId: string }) {
     const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOADING);
     const CurrentSceneComponent = SceneMap[currentScene];
 
+    const [isMobile, setIsMobile] = useState(false);
+
     //Input
+
+    // Mouse and Keyb
+    const pressedKeys = usePressedKeys();
+    const mousePosition = useMousePosition();
+
+    // Joystick
 
     const [joystickDirection, setJoystickDirection] = useState<Vector2>(
         new Vector2(0, 0)
     );
 
-    const pressedKeys = usePressedKeys();
-
+    //Input Direciton
     const inputDirection = pressedKeys.size
         ? pressedKeysToVector(pressedKeys)
         : joystickDirection;
+
+    useEffect(() => {
+        setIsMobile(isMobileDevice());
+    }, []);
 
 
     const sessionSocket = usePartySocket({
@@ -99,15 +112,17 @@ export function SessionManager({ gameId }: { gameId: string }) {
                     <p className="text-black text-3xl">SESSION STATE: {sessionState}</p>
 
                     <div className="fix-ios" style={{ position: "absolute", bottom: "3vh", left: "3vw" }}>
-                        <Joystick
-                            size={100}
-                            sticky={false}
-                            baseColor="white"
-                            stickColor="grey"
-                            start={() => setJoystickDirection(new Vector2(0, 0))}
-                            move={(e) => setJoystickDirection(new Vector2(e.x!, -e.y!))}
-                            stop={() => setJoystickDirection(new Vector2(0, 0))}
-                        />
+                        {isMobile && (
+                            <Joystick
+                                size={100}
+                                sticky={false}
+                                baseColor="white"
+                                stickColor="grey"
+                                start={() => setJoystickDirection(new Vector2(0, 0))}
+                                move={(e) => setJoystickDirection(new Vector2(e.x!, -e.y!))}
+                                stop={() => setJoystickDirection(new Vector2(0, 0))}
+                            />
+                        )}
                     </div>
 
                 </div>
