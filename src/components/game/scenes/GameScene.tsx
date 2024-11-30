@@ -22,8 +22,8 @@ export default function GameScene() {
 
             <PlayerTankHandler
                 position={[0, 0, 0]}
-                bodyDirection={1}
-                headDirection={3}
+                bodyRotation={1}
+                headRotation={3}
                 isLocalPlayer={false}
                 name={'test'}
                 playerColor={'blue'}

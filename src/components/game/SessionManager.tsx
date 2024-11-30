@@ -9,6 +9,7 @@ import { usePartySocket } from "partysocket/react";
 import { Vector2 } from "three";
 import { pressedKeysToVector, useMousePosition, usePressedKeys } from "./input/input";
 import { GameState, RoomState, Scenes, SessionState } from "./gameTypes";
+import { isMobileDevice } from "@/helpers/isMobileDevice";
 // import { isMobileDevice } from "@/helpers/isMobileDevice";
 
 
@@ -64,7 +65,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
         return SceneComponent ? <SceneComponent {...sceneProps} /> : null; // Render with props
     };
 
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(true);
 
     //Input
 
@@ -83,9 +84,10 @@ export function SessionManager({ gameId }: { gameId: string }) {
         ? pressedKeysToVector(pressedKeys)
         : joystickDirection;
 
-    // useEffect(() => {
-    //     setIsMobile(isMobileDevice());
-    // }, []);
+    useEffect(() => {
+        // setIsMobile(isMobileDevice());
+        sessionSocket.send(JSON.stringify({ inputDirection }))
+    }, [inputDirection]);
 
 
     const sessionSocket = usePartySocket({

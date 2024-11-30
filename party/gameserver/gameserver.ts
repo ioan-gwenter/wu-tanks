@@ -7,21 +7,19 @@ const EXPIRY_PERIOD_MILLISECONDS: number = 1 * 60 * 1000; //How long a room shou
 
 const TPS: number = 10;
 
-type gameState = {
-    tanks: Array<{ id: string; position: [number, number], rotation: [number, number] }>;
-    bullets: Array<{ id: string; position: [number, number], rotation: [number], bounces: number }>;
-    mines: Array<{ id: string; position: [number, number] }>;
-}
+
 
 
 export default class GameServer implements Party.Server {
     roomId: string;
     interval: ReturnType<typeof setInterval> | undefined;
+
     gameState: gameState = {
-        tanks: [],
+        tanks: {},
         bullets: [],
         mines: []
     }
+
 
     constructor(readonly room: Party.Room, roomId: string) {
         roomId = this.room.id.toString()
@@ -47,12 +45,14 @@ export default class GameServer implements Party.Server {
             scene: "LOBBY",
             state: "AWAIT_START",
         })));
+
+        this.gameState.tanks
+
     }
 
     // SERVER MESSAGES
     async onMessage(message: string, sender: Party.Connection) {
-        console.log(`connection ${sender.id} sent message: ${message}`);
-        this.room.broadcast(`${sender.id}: ${message}`, [sender.id]);
+
         await this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS);
     }
 
