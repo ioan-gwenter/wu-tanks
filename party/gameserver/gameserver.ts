@@ -1,65 +1,84 @@
 import type * as Party from "partykit/server";
 import { handleRequest } from "./handlers/onRequestHandler";
 import { createMessage } from "./messaging/messageTypes";
+import GameStateManager from "./gameManager";
 
 
 const EXPIRY_PERIOD_MILLISECONDS: number = 1 * 60 * 1000; //How long a room should be active for
 
 const TPS: number = 10;
 
-
-
-
 export default class GameServer implements Party.Server {
-    roomId: string;
-    interval: ReturnType<typeof setInterval> | undefined;
+    private roomId: string;
+    private interval: ReturnType<typeof setInterval> | undefined;
 
-    gameState: gameState = {
-        tanks: {},
-        bullets: [],
-        mines: []
-    }
+    private gameStateManager: GameStateManager;
 
 
     constructor(readonly room: Party.Room, roomId: string) {
         roomId = this.room.id.toString()
-
+        this.gameStateManager = new GameStateManager();
     }
 
     async onStart() {
         if (this.room.id) {
-            // save id when room starts from a connection or request
             await this.room.storage.put<string>("id", this.room.id);
         }
-        this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS); //start the expiry alarm
+        this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS);
 
-        //Server Game Loop
+        // Server Game Loop
         this.interval = setInterval(() => {
 
+            const now = Date.now();
+
+            this.gameStateManager.processInputs();
+
+            this.gameStateManager.update(now);
+
+            const deltas = this.gameStateManager.generateDeltas();
+
+            this.room.broadcast(JSON.stringify({
+                type: "GAME_UPDATE",
+                timestamp: now,
+                sequence: this.gameStateManager.getSequence(),
+                deltas,
+            }));
         }, Math.floor(1000 / TPS));
     }
+
 
     // HANDLE SOCKET CONNECTIONS
     async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
         conn.send(JSON.stringify(createMessage("sessionStateUpdate", {
-            scene: "LOBBY",
             state: "AWAIT_START",
         })));
-
-        this.gameState.tanks
 
     }
 
     // SERVER MESSAGES
     async onMessage(message: string, sender: Party.Connection) {
+        const parsedMessage = JSON.parse(message);
 
-        await this.room.storage.setAlarm(Date.now() + EXPIRY_PERIOD_MILLISECONDS);
+        const { type, data, timestamp } = parsedMessage;
+        const latency = Date.now() - timestamp;
+
+        switch (type) {
+            case ("INPUT"):
+                this.gameStateManager.addInput(sender.id, data, timestamp, latency);
+                return;
+            default:
+                return;
+
+        }
     }
+
+    // console.log(`Received ${type} from ${sender.id} with latency: ${latency}ms`);
 
     // HTTP REQUESTS
     async onRequest(request: Party.Request): Promise<Response> {
         return handleRequest(this, request);
     }
+
 
     // Alarm used for deactivating room when inactivity
     async onAlarm(): Promise<void> {

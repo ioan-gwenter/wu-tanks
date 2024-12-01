@@ -24,20 +24,20 @@ type GLTFResult = GLTF & {
 }
 
 type EnemyTankProps = JSX.IntrinsicElements['group'] & {
-    headDirection?: number;
-    bodyDirection?: number;
-    enemyColor?: string; // Optional color for BodyFlat material
+    headRotation?: number;
+    bodyRotation?: number;
+    color?: string; // Optional color for BodyFlat material
 };
 
 export function EnemyTank({
-    headDirection = 0, // Default rotation
-    bodyDirection = 0, // Default rotation
-    enemyColor = '#00F0AF', // Default BodyFlat color
+    headRotation = 0, // Default rotation
+    bodyRotation = 0, // Default rotation
+    color = '#00F0AF', // Default BodyFlat color
     ...props
 }: EnemyTankProps) {
     const { nodes, materials } = useGLTF('/models/EnemyTank.glb') as GLTFResult;
 
-    materials['BodyFlat.001'].color = new THREE.Color(enemyColor);
+    materials['BodyFlat.001'].color = new THREE.Color(color);
 
     return (
         <group {...props} dispose={null}>
@@ -48,7 +48,7 @@ export function EnemyTank({
                     receiveShadow
                     geometry={nodes.Body.geometry}
                     material={materials['BodyFlat.001']}
-                    rotation={[0, bodyDirection, -Math.PI]}
+                    rotation={[0, bodyRotation, -Math.PI]}
                     scale={[-0.13, -0.052, -0.17]}
                     userData={{ name: 'Body' }}>
                     <group name="Tracks" scale={[1.3, 0.952, 0.952]} userData={{ name: 'Tracks' }}>
@@ -75,7 +75,7 @@ export function EnemyTank({
                     geometry={nodes.Head.geometry}
                     material={materials['BodyFlat.001']}
                     position={[0, 0.164, 0]}
-                    rotation={[-Math.PI, headDirection, -Math.PI]}
+                    rotation={[-Math.PI, headRotation, -Math.PI]}
                     scale={[0.098, 0.061, 0.098]}
                     userData={{ name: 'Head' }}>
                     <group

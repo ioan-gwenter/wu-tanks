@@ -1,56 +1,38 @@
 'use client';
 
-import { OrbitControls, OrthographicCamera, PerspectiveCamera } from '@react-three/drei';
-import { Stage } from '../components/Stage';
-import { EnemyTank } from '../components/EnemyTank';
+import DefaultBackdrop from '../components/DefaultBackdrop';
 import { PlayerTankHandler } from '../components/PlayerTankHandler';
+import { EnemyTank } from '../components/EnemyTank';
+import { GameSceneProps, GameState } from '../helpers/gameTypes';
+import { mapToVector3 } from '../helpers/gameHelper';
 
-
-export default function GameScene() {
+const GameScene: React.FC<GameSceneProps> = ({ gameState }) => {
     return (
         <>
+            {/* Backdrop */}
+            <DefaultBackdrop zoom={160} />
 
-            <OrthographicCamera
-                makeDefault
-                position={[0, 5, 5]}
-                rotation={[-Math.PI / 4, 0, 0]}
-                zoom={230}
-            />
-            <OrbitControls />
-            {/* Stage */}
-            <Stage position={[0.1, -0.07, -0.7]} />
-
-            <PlayerTankHandler
-                position={[0, 0, 0]}
-                bodyRotation={1}
-                headRotation={3}
-                isLocalPlayer={false}
-                name={'test'}
-                playerColor={'blue'}
-            />
-
-            <EnemyTank
-                position={[1, 0, 0]}
-                bodyDirection={1}
-                headDirection={3}
-                name={'test'}
-                enemyColor={'blue'}
-
-            />
-
-            {/* Lights */}
-            <pointLight intensity={40} position={[0, 5, 7]} castShadow receiveShadow />
-            <ambientLight intensity={0.2} castShadow />
-            <spotLight
-                position={[0, 10, 0]}
-                angle={0.7}
-                penumbra={1}
-                intensity={200}
-                castShadow
-                receiveShadow
-            />
-
-
+            {/* Render Tanks */}
+            {Object.entries(gameState.tanks).map(([id, tank]) => {
+                const isPlayerTank = !id.startsWith("enemy"); // Determine if it's a player tank
+                return isPlayerTank ? (
+                    <PlayerTankHandler
+                        key={id}
+                        position={mapToVector3(tank.position)}
+                        headRotation={tank.headRotation}
+                        bodyRotation={tank.bodyRotation}
+                    />
+                ) : (
+                    <EnemyTank
+                        key={id}
+                        position={mapToVector3(tank.position)}
+                        headRotation={tank.headRotation}
+                        bodyRotation={tank.bodyRotation}
+                    />
+                );
+            })}
         </>
     );
-}
+};
+
+export default GameScene;

@@ -1,13 +1,14 @@
 import { forwardRef } from "react";
 import { Group, Quaternion } from "three";
 import { PlayerTank } from "./PlayerTank";
+import { Vector3 } from "@react-three/fiber";
 
 export const PlayerTankHandler = forwardRef<
     Group | null,
     {
         bodyRotation?: number;
         headRotation?: number;
-        position?: [number, number, number];
+        position?: Vector3;
         isLocalPlayer?: boolean;
         name?: string;
         playerColor?: string;

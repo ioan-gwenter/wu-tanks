@@ -1,92 +1,64 @@
-"use client"
+"use client";
 import { Suspense, useEffect, useState } from "react";
 import { Common, View } from "../canvas/View";
 import { MenuTank } from "../canvas/MenuTank";
-import LobbyScene from "./scenes/LobbyScene";
 import { Joystick } from "react-joystick-component";
-import GameScene from "./scenes/GameScene";
 import { usePartySocket } from "partysocket/react";
 import { Vector2 } from "three";
 import { pressedKeysToVector, useMousePosition, usePressedKeys } from "./input/input";
-import { GameState, RoomState, Scenes, SessionState } from "./gameTypes";
-import { isMobileDevice } from "@/helpers/isMobileDevice";
-// import { isMobileDevice } from "@/helpers/isMobileDevice";
-
-
-
-// Map SceneState to Scene Objects
-const SceneMap = {
-    [Scenes.LOADING]: MenuTank, //Placeholder for loading menu
-    [Scenes.LOBBY]: LobbyScene,
-    [Scenes.GAME]: GameScene,
-    [Scenes.GAME_OVER]: MenuTank,
-};
+import GameScene from "./scenes/GameScene";
+import { GameState } from "./helpers/gameTypes";
 
 
 
 
 export function SessionManager({ gameId }: { gameId: string }) {
-
-    const getSceneProps = (scene) => {
-        switch (scene) {
-            case Scenes.LOADING:
-                return {};
-            case Scenes.LOBBY:
-                return { gameState: sessionState.gameState };
-            case Scenes.GAME:
-                return {};
-            case Scenes.GAME_OVER:
-                return {};
-            default:
-                return {};
-        }
+    const initialGameState: GameState = {
+        roomState: "LOADING",
+        tanks: {},
+        bullets: {},
+        mines: {},
+        currentRound: 0,
+        currentMap: [],
     };
 
-    // Connect to the game server
-
-    // Session State Machine Management
-    const [sessionState, setSessionState] = useState<SessionState>({
-        roomState: RoomState.LOADING,
-        currentScene: Scenes.LOADING,
-        roundNumber: 1,
-        currentMap: "default_map",
-        gameState: {
-            tanks: [],
-            bullets: [],
-            mines: [],
-        },
-    });
-
-    // Scene Display Management
-    const [currentScene, setCurrentScene] = useState<Scenes>(Scenes.LOADING);
-    const CurrentSceneComponent = ({ currentScene }) => {
-        const SceneComponent = SceneMap[currentScene]; // Get the mapped component
-        const sceneProps = getSceneProps(currentScene); // Get the corresponding props
-        return SceneComponent ? <SceneComponent {...sceneProps} /> : null; // Render with props
-    };
-
+    const [gameState, setGameState] = useState<GameState>(initialGameState);
     const [isMobile, setIsMobile] = useState(true);
 
-    //Input
+    const updateGameState = (updates: Partial<GameState>) => {
+        setGameState((prevState) => ({
+            ...prevState,
+            ...updates,
+            tanks: {
+                ...prevState.tanks,
+                ...(updates.tanks || {}),
+            },
+            bullets: {
+                ...prevState.bullets,
+                ...(updates.bullets || {}),
+            },
+            mines: {
+                ...prevState.mines,
+                ...(updates.mines || {}),
+            },
+            currentMap: updates.currentMap ?? prevState.currentMap, // Replace map only if provided
+        }));
+    };
 
-    // Mouse and Keyb
+    // Input
     const pressedKeys = usePressedKeys();
     const mousePosition = useMousePosition();
-
-    // Joystick
-
     const [joystickDirection, setJoystickDirection] = useState<Vector2>(
         new Vector2(0, 0)
     );
 
-    //Input Direciton
     const inputDirection = pressedKeys.size
         ? pressedKeysToVector(pressedKeys)
         : joystickDirection;
 
+
     useEffect(() => {
-        // setIsMobile(isMobileDevice());
-        sessionSocket.send(JSON.stringify({ inputDirection }))
+        sessionSocket.send(JSON.stringify({ inputDirection }));
     }, [inputDirection]);
 
 
@@ -99,24 +71,18 @@ export function SessionManager({ gameId }: { gameId: string }) {
             const dataReceived = JSON.parse(event.data);
             console.log("Received message:", dataReceived);
 
-            const { type, payload } = dataReceived;
+            const { type, data, timestamp } = dataReceived;
 
             switch (type) {
                 case "sessionStateUpdate":
-                    setSessionState((prevState) => ({
-                        ...prevState,
-                        roomState: payload.state,
-                        currentScene: payload.scene,
-                    }));
-                    setCurrentScene(payload.scene)
+                    updateGameState({ roomState: "LOBBY" });
+                    break;
 
                 default:
                     console.warn("Unknown message type:", type);
                     break;
-
             }
-        }
-
+        },
     });
 
     return (
@@ -125,9 +91,12 @@ export function SessionManager({ gameId }: { gameId: string }) {
             <div className="absolute inset-0 z-10 pointer-events-none flex items-start justify-center">
                 <div className="pointer-events-auto p-4">
                     {/* UI content */}
-                    <p className="text-black text-3xl">SESSION STATE: {sessionState.roomState}</p>
+                    <p className="text-black text-3xl">SESSION STATE: {gameState.roomState}</p>
 
-                    <div className="fix-ios" style={{ position: "absolute", bottom: "3vh", left: "3vw" }}>
+                    <div
+                        className="fix-ios"
+                        style={{ position: "absolute", bottom: "3vh", left: "3vw" }}
+                    >
                         {isMobile && (
                             <Joystick
                                 size={100}
@@ -140,17 +109,15 @@ export function SessionManager({ gameId }: { gameId: string }) {
                             />
                         )}
                     </div>
-
                 </div>
             </div>
 
             {/* 3D View Div */}
             <View className="absolute inset-0 z-0">
                 <Suspense fallback={null}>
-                    <CurrentSceneComponent currentScene={currentScene} />
+                    <GameScene gameState={gameState} />
                 </Suspense>
             </View>
         </div>
     );
-
 }

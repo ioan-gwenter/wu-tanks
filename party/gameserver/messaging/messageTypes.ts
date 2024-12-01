@@ -12,12 +12,11 @@ type Message<T extends MessageType, Payload> = BaseMessage & {
 
 // Payloads
 interface SessionStatePayload {
-    scene: string;
     state: string;
 }
 
 interface GameStatePayload {
-    tanks: Array<{ id: string; position: [number, number], rotation: [number, number] }>;
+    tanks: Array<{ id: string; position: [number, number], headRotation: number, bodyRotation: number }>;
     bullets: Array<{ id: string; position: [number, number], rotation: [number], bounces: number }>;
     mines: Array<{ id: string; position: [number, number] }>;
 }
