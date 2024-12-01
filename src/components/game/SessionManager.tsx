@@ -7,7 +7,16 @@ import { usePartySocket } from "partysocket/react";
 import { Vector2 } from "three";
 import { pressedKeysToVector, useMousePosition, usePressedKeys } from "./input/input";
 import GameScene from "./scenes/GameScene";
-import { GameState } from "./helpers/gameTypes";
+import { Bullet, GameState, Mine, Tank } from "./helpers/gameTypes";
+import { InputMessageData, sendMessage } from "./messaging/messages";
+import { mergeDeltas } from "./helpers/gameHelper";
+
+
+interface DeltaUpdate {
+    tanks?: { [id: string]: Partial<Tank> };
+    bullets?: { [id: string]: Partial<Bullet> };
+    mines?: { [id: string]: Partial<Mine> };
+}
 
 
 
@@ -24,6 +33,37 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
     const [gameState, setGameState] = useState<GameState>(initialGameState);
     const [isMobile, setIsMobile] = useState(true);
+
+    const sessionSocket = usePartySocket({
+        host: "localhost:1999",
+        room: gameId,
+        party: "gameserver",
+
+        onMessage(event) {
+            const dataReceived = JSON.parse(event.data);
+            console.log("Received message:", dataReceived);
+
+            const { type, data, timestamp } = dataReceived;
+
+            switch (type) {
+                case "sessionStateUpdate":
+                    updateGameState({ roomState: "LOBBY" });
+                    break;
+                case "GAME_UPDATE":
+                    console.log("delta recieved")
+                    if (data && data.deltas) {
+                        console.log("DELTA ddddddddddddddddddddddddddddddddddddddddddddddddd");
+                        console.log(data.deltas);
+                        applyDeltas(data.deltas);
+                    }
+                    break;
+
+                default:
+                    console.warn("Unknown message type:", type);
+                    break;
+            }
+        },
+    });
 
     const updateGameState = (updates: Partial<GameState>) => {
         setGameState((prevState) => ({
@@ -45,6 +85,19 @@ export function SessionManager({ gameId }: { gameId: string }) {
         }));
     };
 
+
+    const applyDeltas = (deltas: DeltaUpdate) => {
+        setGameState((prevState) => ({
+            ...prevState,
+            tanks: mergeDeltas(prevState.tanks, deltas.tanks),
+            bullets: mergeDeltas(prevState.bullets, deltas.bullets),
+            mines: mergeDeltas(prevState.mines, deltas.mines),
+        }));
+    };
+
+
+
+
     // Input
     const pressedKeys = usePressedKeys();
     const mousePosition = useMousePosition();
@@ -58,32 +111,20 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
 
     useEffect(() => {
-        sessionSocket.send(JSON.stringify({ inputDirection }));
-    }, [inputDirection]);
+        // Create InputMessageData based on current input state
+        const inputMessageData: InputMessageData = {
+            movementInput: inputDirection.length() > 0 ? inputDirection : undefined,
+            mousePosition: mousePosition ? new Vector2(mousePosition.x, mousePosition.y) : undefined,
+        };
+
+        // Send the message if there are any inputs
+        if (inputMessageData.movementInput || inputMessageData.mousePosition) {
+            sendMessage(sessionSocket, "INPUT", inputMessageData);
+        }
+    }, [inputDirection, mousePosition, sessionSocket]);
 
 
-    const sessionSocket = usePartySocket({
-        host: "localhost:1999",
-        room: gameId,
-        party: "gameserver",
 
-        onMessage(event) {
-            const dataReceived = JSON.parse(event.data);
-            console.log("Received message:", dataReceived);
-
-            const { type, data, timestamp } = dataReceived;
-
-            switch (type) {
-                case "sessionStateUpdate":
-                    updateGameState({ roomState: "LOBBY" });
-                    break;
-
-                default:
-                    console.warn("Unknown message type:", type);
-                    break;
-            }
-        },
-    });
 
     return (
         <div className="relative h-screen w-screen">

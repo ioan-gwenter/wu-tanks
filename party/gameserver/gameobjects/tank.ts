@@ -1,30 +1,45 @@
 import { GameObject } from "./gameObjectBase";
 
+interface TankOptions {
+    position?: [number, number];
+    velocity?: [number, number];
+    bodyRotation?: number;
+    headRotation?: number;
+    color?: string;
+    isDead?: boolean;
+    isFiring?: boolean;
+    isPlacingMine?: boolean;
+}
+
 export class Tank extends GameObject {
     private position: [number, number];
     private velocity: [number, number];
     private bodyRotation: number;
     private headRotation: number;
+    private color: string;
     private isDead: boolean;
     private isFiring: boolean;
     private isPlacingMine: boolean;
 
     private lastUpdateTime: number;
 
-    constructor(
-        position: [number, number],
-        bodyRotation: number,
-        initialVelocity: [number, number] = [0, 0],
-        headRotation: number,
+    constructor({
+        position = [0, 0],
+        velocity = [0, 0],
+        bodyRotation = 0,
+        headRotation,
+        color = "#FFFFFF",
         isDead = false,
         isFiring = false,
-        isPlacingMine = false
-    ) {
+        isPlacingMine = false,
+    }: TankOptions) {
         super();
+
         this.position = position;
-        this.velocity = initialVelocity;
+        this.velocity = velocity;
         this.bodyRotation = bodyRotation;
         this.headRotation = headRotation;
+        this.color = color;
         this.isDead = isDead;
         this.isFiring = isFiring;
         this.isPlacingMine = isPlacingMine;

@@ -1,3 +1,4 @@
+import PartySocket from "partysocket";
 import { useEffect, useState } from "react";
 import { Vector2, Vector3 } from "three";
 

@@ -6,7 +6,7 @@ import GameStateManager from "./gameManager";
 
 const EXPIRY_PERIOD_MILLISECONDS: number = 1 * 60 * 1000; //How long a room should be active for
 
-const TPS: number = 10;
+const TPS: number = 0.5;
 
 export default class GameServer implements Party.Server {
     private roomId: string;
@@ -36,13 +36,17 @@ export default class GameServer implements Party.Server {
             this.gameStateManager.update(now);
 
             const deltas = this.gameStateManager.generateDeltas();
+            if (deltas) {
+                this.room.broadcast(JSON.stringify({
+                    type: "GAME_UPDATE",
+                    data: {
+                        sequence: this.gameStateManager.getSequence(),
+                        deltas,
+                    },
+                    timestamp: now,
+                }));
+            }
 
-            this.room.broadcast(JSON.stringify({
-                type: "GAME_UPDATE",
-                timestamp: now,
-                sequence: this.gameStateManager.getSequence(),
-                deltas,
-            }));
         }, Math.floor(1000 / TPS));
     }
 
@@ -50,9 +54,9 @@ export default class GameServer implements Party.Server {
     // HANDLE SOCKET CONNECTIONS
     async onConnect(conn: Party.Connection, ctx: Party.ConnectionContext) {
         conn.send(JSON.stringify(createMessage("sessionStateUpdate", {
-            state: "AWAIT_START",
+            state: "LOBBY",
         })));
-
+        this.gameStateManager.addTank(conn.id)
     }
 
     // SERVER MESSAGES

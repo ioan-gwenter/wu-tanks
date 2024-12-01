@@ -42,6 +42,16 @@ export default class GameStateManager {
         };
     }
 
+    addTank(tankId: string): void {
+        if (this.tanks[tankId]) {
+            console.warn(`Tank with ID ${tankId} already exists.`);
+            return;
+        }
+
+        this.tanks[tankId] = new Tank({});
+        console.log(`Tank with ID ${tankId} Created`);
+    }
+
     getSequence(): number {
         return this.sequenceNumber;
     }
@@ -66,17 +76,17 @@ export default class GameStateManager {
         // Apply latency compensation
         const adjustedTimestamp = Date.now() - latency;
 
-        switch (input.type) {
-            case "MOVE":
-                tank.move(input.direction, adjustedTimestamp);
-                break;
-            // case "FIRE":
-            //     this.spawnBullet(clientId, input.target, adjustedTimestamp);
-            //     break;
-            // case "PLACE_MINE":
-            //     this.spawnMine(clientId, input.position, adjustedTimestamp);
-            //     break;
-        }
+        // switch (input.type) {
+        //     case "MOVE":
+        //         tank.move(input.direction, adjustedTimestamp);
+        //         break;
+        //     // case "FIRE":
+        //     //     this.spawnBullet(clientId, input.target, adjustedTimestamp);
+        //     //     break;
+        //     // case "PLACE_MINE":
+        //     //     this.spawnMine(clientId, input.position, adjustedTimestamp);
+        //     //     break;
+        // }
     }
 
     // Update game state (called every tick)
@@ -86,21 +96,33 @@ export default class GameStateManager {
     }
 
     // Generate delta updates
-    generateDeltas(): DeltaUpdate {
-        const deltas: DeltaUpdate = {
-            tanks: this.getDelta(this.tanks, this.previousState.tanks),
-            bullets: this.getDelta(this.bullets, this.previousState.bullets),
-            mines: this.getDelta(this.mines, this.previousState.mines),
-        };
+    generateDeltas(): DeltaUpdate | null {
+        const tanksDelta = this.getDelta(this.tanks, this.previousState.tanks);
+        const bulletsDelta = this.getDelta(this.bullets, this.previousState.bullets);
+        const minesDelta = this.getDelta(this.mines, this.previousState.mines);
 
-        // Next Tick
+        // Check if there are any deltas
+        if (
+            Object.keys(tanksDelta).length === 0 &&
+            Object.keys(bulletsDelta).length === 0 &&
+            Object.keys(minesDelta).length === 0
+        ) {
+            return null; // No deltas to return
+        }
+
+        // Update previous state for the next tick
         this.previousState = {
             tanks: { ...this.tanks },
             bullets: { ...this.bullets },
             mines: { ...this.mines },
         };
 
-        return deltas;
+        // Return the deltas
+        return {
+            tanks: tanksDelta,
+            bullets: bulletsDelta,
+            mines: minesDelta,
+        };
     }
 
     // Delta calculation logic
