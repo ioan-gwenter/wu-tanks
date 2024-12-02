@@ -100,12 +100,6 @@ export default class GameStateManager {
     // Update game state (called every tick)
     update(timestamp: number): void {
         this.processPhysics();
-        for (const tankId in this.tanks) {
-            const tank = this.tanks[tankId];
-            if (tank) {
-                tank.stop();
-            }
-        }
         this.sequenceNumber++;
     }
 
@@ -181,5 +175,11 @@ export default class GameStateManager {
 
     // Process physics TODO
     private processPhysics(): void {
+        for (const tankId in this.tanks) {
+            const tank = this.tanks[tankId];
+            if (tank) {
+                tank.updateState();
+            }
+        }
     }
 }

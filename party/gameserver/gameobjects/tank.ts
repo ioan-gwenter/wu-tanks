@@ -50,14 +50,20 @@ export class Tank extends GameObject {
 
     // Update the tank's movement based on direction and timestamp
     move(direction: Vector2, timestamp: number): void {
+
+        // Handling Lag (TODO)
         const timeDelta = (timestamp - this.lastUpdateTime) / 1000;
         this.lastUpdateTime = timestamp;
 
-        // Update velocity based on direction
-        this.velocity.copy(direction.clone().multiplyScalar(0.1));
+        // Normalise
+        const newVelocity = direction.clone();
+        if (newVelocity.length() > 0) {
+            newVelocity.normalize().multiplyScalar(0.04); // Adjust speed multiplier as needed
+        }
 
-        // Update position based on velocity and time delta
-        this.position.add(this.velocity.clone());
+        // Update velocity
+        this.velocity.copy(newVelocity);
+
     }
 
     getPosition(): Vector2 {
@@ -70,9 +76,13 @@ export class Tank extends GameObject {
     }
 
     updateState(): void {
+        // Update position based on velocity and time delta
+        this.position.add(this.velocity.clone());
 
     }
 
     getStatePayload(): any {
+        // Update position
+        this.position.add(this.velocity.clone());
     }
 }

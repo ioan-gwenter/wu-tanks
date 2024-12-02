@@ -1,13 +1,17 @@
-import PartySocket from "partysocket";
 import { useEffect, useState } from "react";
-import { Vector2, Vector3 } from "three";
+import { Vector2 } from "three";
 
+// Key press tracking
 export function usePressedKeys() {
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
-            setPressedKeys((prev) => new Set(prev).add(event.key));
+            setPressedKeys((prev) => {
+                const newSet = new Set(prev);
+                newSet.add(event.key);
+                return newSet;
+            });
         };
 
         const onKeyUp = (event: KeyboardEvent) => {
@@ -30,12 +34,12 @@ export function usePressedKeys() {
     return pressedKeys;
 }
 
+// Mouse position tracking
 export function useMousePosition() {
     const [mousePosition, setMousePosition] = useState<Vector2>(new Vector2(0, 0));
 
     useEffect(() => {
         const onMouseMove = (event: MouseEvent) => {
-            // Update mouse position
             setMousePosition(new Vector2(event.clientX, event.clientY));
         };
 
@@ -49,44 +53,14 @@ export function useMousePosition() {
     return mousePosition;
 }
 
+// Convert pressed keys to a direction vector
 export function pressedKeysToVector(pressedKeys: Set<string>): Vector2 {
     const vector = new Vector2(0, 0);
 
-    // UP
-    if (
-        pressedKeys.has("w") ||
-        pressedKeys.has("W") ||
-        pressedKeys.has("ArrowUp")
-    ) {
-        vector.y -= 1;
-    }
-
-    // LEFT
-    if (
-        pressedKeys.has("a") ||
-        pressedKeys.has("A") ||
-        pressedKeys.has("ArrowLeft")
-    ) {
-        vector.x -= 1;
-    }
-
-    // DOWN
-    if (
-        pressedKeys.has("s") ||
-        pressedKeys.has("S") ||
-        pressedKeys.has("ArrowDown")
-    ) {
-        vector.y += 1;
-    }
-
-    // RIGHT
-    if (
-        pressedKeys.has("d") ||
-        pressedKeys.has("D") ||
-        pressedKeys.has("ArrowRight")
-    ) {
-        vector.x += 1;
-    }
+    if (pressedKeys.has("w") || pressedKeys.has("W") || pressedKeys.has("ArrowUp")) vector.y -= 1;
+    if (pressedKeys.has("a") || pressedKeys.has("A") || pressedKeys.has("ArrowLeft")) vector.x -= 1;
+    if (pressedKeys.has("s") || pressedKeys.has("S") || pressedKeys.has("ArrowDown")) vector.y += 1;
+    if (pressedKeys.has("d") || pressedKeys.has("D") || pressedKeys.has("ArrowRight")) vector.x += 1;
 
     return vector;
 }

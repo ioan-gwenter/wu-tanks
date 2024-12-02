@@ -41,7 +41,7 @@ export function SessionManager({ gameId }: { gameId: string }) {
 
         onMessage(event) {
             const dataReceived = JSON.parse(event.data);
-            console.log("Received message:", dataReceived);
+            // console.log("Received message:", dataReceived); //Debug
 
             const { type, data, timestamp } = dataReceived;
 
@@ -50,9 +50,8 @@ export function SessionManager({ gameId }: { gameId: string }) {
                     updateGameState({ roomState: "LOBBY" });
                     break;
                 case "GAME_UPDATE":
-                    console.log("delta recieved")
                     if (data && data.deltas) {
-                        console.log(data.deltas);
+                        // console.log(data.deltas); // debug
                         applyDeltas(data.deltas);
                     }
                     break;
@@ -94,34 +93,46 @@ export function SessionManager({ gameId }: { gameId: string }) {
         }));
     };
 
-
-
-
     // Input
-    const pressedKeys = usePressedKeys();
+
+    const [joystickDirection, setJoystickDirection] = useState<Vector2>(new Vector2(0, 0));
+    const [inputDirection, setInputDirection] = useState<Vector2>(new Vector2(0, 0));
     const mousePosition = useMousePosition();
-    const [joystickDirection, setJoystickDirection] = useState<Vector2>(
-        new Vector2(0, 0)
-    );
 
-    const inputDirection = pressedKeys.size
-        ? pressedKeysToVector(pressedKeys)
-        : joystickDirection;
+    // Track the state of pressed keys to prevent redundant messages
+    const [previousPressedKeys, setPreviousPressedKeys] = useState<Set<string>>(new Set());
+    const pressedKeys = usePressedKeys();
 
-
+    // Update direction and send input on key press/release
     useEffect(() => {
-        // Create InputMessageData based on current input state
-        const inputMessageData: InputMessageData = {
-            movementInput: inputDirection.length() > 0 ? inputDirection : undefined,
-            mousePosition: mousePosition ? new Vector2(mousePosition.x, mousePosition.y) : undefined,
-        };
+        const newDirection = pressedKeysToVector(pressedKeys);
 
-        // Send the message if there are any inputs
-        if (inputMessageData.movementInput || inputMessageData.mousePosition) {
-            sendMessage(sessionSocket, "INPUT", inputMessageData);
+        if (!newDirection.equals(inputDirection)) {
+            setInputDirection(newDirection);
+
+            // Send movement update to the server
+            sendMessage(sessionSocket, "INPUT", { movementInput: newDirection });
         }
-    }, [inputDirection, mousePosition, sessionSocket]);
 
+        // Track pressed keys to detect key release
+        if (pressedKeys !== previousPressedKeys) {
+            setPreviousPressedKeys(pressedKeys);
+        }
+    }, [pressedKeys, sessionSocket, inputDirection, previousPressedKeys]);
+
+    // Joystick handling
+    useEffect(() => {
+        if (!joystickDirection.equals(new Vector2(0, 0))) {
+            sendMessage(sessionSocket, "INPUT", { movementInput: joystickDirection });
+        }
+    }, [joystickDirection, sessionSocket]);
+
+    // Mouse position updates
+    useEffect(() => {
+        if (mousePosition) {
+            sendMessage(sessionSocket, "INPUT", { mousePosition });
+        }
+    }, [mousePosition, sessionSocket]);
 
 
 
