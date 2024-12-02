@@ -179,8 +179,6 @@ export default class GameStateManager {
     }
 
 
-
-
     // Process physics TODO
     private processPhysics(): void {
         for (const tankId in this.tanks) {
