@@ -52,7 +52,6 @@ export function SessionManager({ gameId }: { gameId: string }) {
                 case "GAME_UPDATE":
                     console.log("delta recieved")
                     if (data && data.deltas) {
-                        console.log("DELTA ddddddddddddddddddddddddddddddddddddddddddddddddd");
                         console.log(data.deltas);
                         applyDeltas(data.deltas);
                     }

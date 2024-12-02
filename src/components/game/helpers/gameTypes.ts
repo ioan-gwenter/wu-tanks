@@ -1,7 +1,9 @@
+import { Vector2 } from "three";
+
 export type RoomState = "LOADING" | "LOBBY" | "ROUND_START" | "ROUND_END" | "GAME_OVER";
 
 export interface Tank {
-    position: [number, number];
+    position: Vector2;
     headRotation: number;
     bodyRotation: number;
     color: string;
@@ -9,12 +11,12 @@ export interface Tank {
 }
 
 export interface Bullet {
-    position: [number, number];
+    position: Vector2;
     rotation: number;
 }
 
 export interface Mine {
-    position: [number, number];
+    position: Vector2;
 }
 
 export interface GameState {

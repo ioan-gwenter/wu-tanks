@@ -23,3 +23,4 @@ export function sendMessage<T>(socket: PartySocket, type: string, data: T): void
     };
     socket.send(JSON.stringify(message));
 }
+

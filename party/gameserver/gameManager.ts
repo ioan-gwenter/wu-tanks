@@ -1,8 +1,13 @@
+import { Vector2 } from "three";
 import { Bullet } from "./gameobjects/bullet";
 import { Mine } from "./gameobjects/mine";
 import { Tank } from "./gameobjects/tank";
 
 type GameState = "LOBBY" | "GAME" | "GAME_OVER";
+
+function deepClone<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+}
 
 interface InputMessage {
     clientId: string;
@@ -71,27 +76,36 @@ export default class GameStateManager {
     // Process a single input with latency compensation
     private processInput(clientId: string, input: any, latency: number, timestamp: number): void {
         const tank = this.tanks[clientId];
-        if (!tank) return;
+        if (!tank) return; // If the tank doesn't exist, do nothing
 
         // Apply latency compensation
         const adjustedTimestamp = Date.now() - latency;
 
-        // switch (input.type) {
-        //     case "MOVE":
-        //         tank.move(input.direction, adjustedTimestamp);
-        //         break;
-        //     // case "FIRE":
-        //     //     this.spawnBullet(clientId, input.target, adjustedTimestamp);
-        //     //     break;
-        //     // case "PLACE_MINE":
-        //     //     this.spawnMine(clientId, input.position, adjustedTimestamp);
-        //     //     break;
-        // }
+        if (input.movementInput) {
+            const { x, y } = input.movementInput;
+
+
+            // Validate that x and y are numbers
+            if (typeof x === "number" && typeof y === "number") {
+                // Pass the movement direction to the tank
+                tank.move(new Vector2(x, y), adjustedTimestamp);
+
+            } else {
+                console.warn(`Invalid movementInput data for clientId: ${clientId}. Expected numbers for x and y.`);
+            }
+        }
+
     }
 
     // Update game state (called every tick)
     update(timestamp: number): void {
         this.processPhysics();
+        for (const tankId in this.tanks) {
+            const tank = this.tanks[tankId];
+            if (tank) {
+                tank.stop();
+            }
+        }
         this.sequenceNumber++;
     }
 
@@ -110,11 +124,11 @@ export default class GameStateManager {
             return null; // No deltas to return
         }
 
-        // Update previous state for the next tick
+        // Deep copy the current state to update previousState
         this.previousState = {
-            tanks: { ...this.tanks },
-            bullets: { ...this.bullets },
-            mines: { ...this.mines },
+            tanks: deepClone(this.tanks),
+            bullets: deepClone(this.bullets),
+            mines: deepClone(this.mines),
         };
 
         // Return the deltas
@@ -125,20 +139,23 @@ export default class GameStateManager {
         };
     }
 
-    // Delta calculation logic
     private getDelta<T>(
         current: { [id: string]: T },
         previous: { [id: string]: T }
     ): { [id: string]: Partial<T> } {
         const delta: { [id: string]: Partial<T> } = {};
 
+        // Check for new or updated objects
         for (const id in current) {
             if (!previous[id]) {
+                // If the object is new, add it entirely to the delta
                 delta[id] = current[id];
             } else {
+                // If the object exists, check for changes
                 const changes: Partial<T> = {};
                 for (const key in current[id]) {
                     if (current[id][key] !== previous[id][key]) {
+                        // Record any changed properties
                         changes[key] = current[id][key];
                     }
                 }
@@ -148,26 +165,19 @@ export default class GameStateManager {
             }
         }
 
+        // Check for removed objects
         for (const id in previous) {
             if (!current[id]) {
-                delta[id] = null; // Mark as removed
+                // If an object exists in previous but not in current, mark it as removed
+                delta[id] = null;
             }
         }
 
         return delta;
     }
 
-    // // Spawn a bullet
-    // private spawnBullet(ownerId: string, target: [number, number], timestamp: number): void {
-    //     const bulletId = `${ownerId}-${timestamp}`;
-    //     this.bullets[bulletId] = new Bullet(this.tanks[ownerId].getPosition(), target, timestamp);
-    // }
 
-    // // Spawn a mine
-    // private spawnMine(ownerId: string, position: [number, number], timestamp: number): void {
-    //     const mineId = `${ownerId}-${timestamp}`;
-    //     this.mines[mineId] = new Mine(position);
-    // }
+
 
     // Process physics TODO
     private processPhysics(): void {

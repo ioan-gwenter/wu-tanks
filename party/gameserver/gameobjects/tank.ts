@@ -1,8 +1,9 @@
+import { Vector2 } from "three";
 import { GameObject } from "./gameObjectBase";
 
 interface TankOptions {
-    position?: [number, number];
-    velocity?: [number, number];
+    position?: Vector2;
+    velocity?: Vector2;
     bodyRotation?: number;
     headRotation?: number;
     color?: string;
@@ -12,8 +13,8 @@ interface TankOptions {
 }
 
 export class Tank extends GameObject {
-    private position: [number, number];
-    private velocity: [number, number];
+    private position: Vector2;
+    private velocity: Vector2;
     private bodyRotation: number;
     private headRotation: number;
     private color: string;
@@ -24,10 +25,10 @@ export class Tank extends GameObject {
     private lastUpdateTime: number;
 
     constructor({
-        position = [0, 0],
-        velocity = [0, 0],
+        position = new Vector2(0, 0),
+        velocity = new Vector2(0, 0),
         bodyRotation = 0,
-        headRotation,
+        headRotation = 0,
         color = "#FFFFFF",
         isDead = false,
         isFiring = false,
@@ -48,28 +49,24 @@ export class Tank extends GameObject {
     }
 
     // Update the tank's movement based on direction and timestamp
-    move(direction: [number, number], timestamp: number): void {
-        const timeDelta = (timestamp - this.lastUpdateTime) / 1000; // Convert to seconds
+    move(direction: Vector2, timestamp: number): void {
+        const timeDelta = (timestamp - this.lastUpdateTime) / 1000;
         this.lastUpdateTime = timestamp;
 
-        // Update velocity based on direction (e.g., normalized direction vector)
-        this.velocity = [direction[0] * 0.1, direction[1] * 0.1]; // Example speed multiplier
+        // Update velocity based on direction
+        this.velocity.copy(direction.clone().multiplyScalar(0.1));
 
         // Update position based on velocity and time delta
-        this.position = [
-            this.position[0] + this.velocity[0] * timeDelta,
-            this.position[1] + this.velocity[1] * timeDelta,
-        ];
+        this.position.add(this.velocity.clone());
     }
 
-    // Getter for the current position
-    getPosition(): [number, number] {
-        return this.position;
+    getPosition(): Vector2 {
+        return this.position.clone(); // Return a copy to prevent external mutations
     }
 
     // Stop movement (optional, for when no input is received)
     stop(): void {
-        this.velocity = [0, 0];
+        this.velocity.set(0, 0);
     }
 
     updateState(): void {

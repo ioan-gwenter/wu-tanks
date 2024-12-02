@@ -1,10 +1,8 @@
-import { Vector3 } from "three";
+import { Vector2, Vector3 } from "three";
 
-export function mapToVector3(position: [number, number], y: number = 0): Vector3 {
-    const [x, z] = position;
-    return new Vector3(x, y, z);
+export function mapToVector3(position: Vector2, y: number = 0): Vector3 {
+    return new Vector3(position.x, y, position.y);
 }
-
 // Merge deltas into the current state
 export const mergeDeltas = <T>(
     current: { [id: string]: T },

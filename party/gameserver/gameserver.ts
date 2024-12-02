@@ -6,7 +6,7 @@ import GameStateManager from "./gameManager";
 
 const EXPIRY_PERIOD_MILLISECONDS: number = 1 * 60 * 1000; //How long a room should be active for
 
-const TPS: number = 0.5;
+const TPS: number = 20;
 
 export default class GameServer implements Party.Server {
     private roomId: string;
@@ -37,6 +37,8 @@ export default class GameServer implements Party.Server {
 
             const deltas = this.gameStateManager.generateDeltas();
             if (deltas) {
+
+
                 this.room.broadcast(JSON.stringify({
                     type: "GAME_UPDATE",
                     data: {
