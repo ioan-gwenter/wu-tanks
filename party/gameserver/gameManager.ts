@@ -3,6 +3,14 @@ import { Bullet } from "./gameobjects/bullet";
 import { Mine } from "./gameobjects/mine";
 import { Tank } from "./gameobjects/tank";
 
+function generatePastelColor(): string {
+    const randomComponent = () => Math.floor(Math.random() * 255); // Range: 127-255
+    const red = randomComponent();
+    const green = randomComponent();
+    const blue = randomComponent();
+    return `#${red.toString(16).padStart(2, '0')}${green.toString(16).padStart(2, '0')}${blue.toString(16).padStart(2, '0')}`;
+}
+
 type GameState = "LOBBY" | "GAME" | "GAME_OVER";
 
 function deepClone<T>(obj: T): T {
@@ -53,7 +61,7 @@ export default class GameStateManager {
             return;
         }
 
-        this.tanks[tankId] = new Tank({});
+        this.tanks[tankId] = new Tank({ color: generatePastelColor() });
         console.log(`Tank with ID ${tankId} Created`);
     }
 

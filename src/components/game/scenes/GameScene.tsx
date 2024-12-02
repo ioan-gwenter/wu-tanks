@@ -21,6 +21,7 @@ const GameScene: React.FC<GameSceneProps> = ({ gameState }) => {
                         position={mapToVector3(tank.position)}
                         headRotation={tank.headRotation}
                         bodyRotation={tank.bodyRotation}
+                        playerColor={tank.color}
                     />
                 ) : (
                     <EnemyTank
@@ -28,6 +29,7 @@ const GameScene: React.FC<GameSceneProps> = ({ gameState }) => {
                         position={mapToVector3(tank.position)}
                         headRotation={tank.headRotation}
                         bodyRotation={tank.bodyRotation}
+                        color={tank.color}
                     />
                 );
             })}

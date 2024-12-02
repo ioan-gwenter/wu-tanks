@@ -39,9 +39,11 @@ export function PlayerTank({
 }: PlayerTankProps) {
     const { nodes, materials } = useGLTF('/models/PlayerTank.glb') as GLTFResult;
 
-    materials['BodyFlat.007'].color = new THREE.Color(playerColor);
-    materials['BodyMetallic.007'].color = new THREE.Color(playerColor);
+    const bodyFlatMaterial = materials['BodyFlat.007'].clone();
+    bodyFlatMaterial.color = new THREE.Color(playerColor);
 
+    const bodyMetallicMaterial = materials['BodyMetallic.007'].clone();
+    bodyMetallicMaterial.color = new THREE.Color(playerColor);
 
 
     return (
@@ -52,7 +54,7 @@ export function PlayerTank({
                     castShadow
                     receiveShadow
                     geometry={nodes.Head.geometry}
-                    material={materials['BodyMetallic.007']}
+                    material={bodyMetallicMaterial}
                     position={[0, 0.164, 0]}
                     rotation={[-Math.PI, headRotation, -Math.PI]} // Apply Z-axis rotation
                     scale={[0.098, 0.061, 0.098]}
@@ -68,7 +70,7 @@ export function PlayerTank({
                             castShadow
                             receiveShadow
                             geometry={nodes.Barrel007.geometry}
-                            material={materials['BodyMetallic.007']}
+                            material={bodyMetallicMaterial}
                         />
                         <mesh
                             name="Barrel007_1"
@@ -84,7 +86,7 @@ export function PlayerTank({
                     castShadow
                     receiveShadow
                     geometry={nodes.Body.geometry}
-                    material={materials['BodyFlat.007']}
+                    material={bodyFlatMaterial}
                     // rotation={[0, 0, -Math.PI].map((defaultRot, i) => defaultRot + bodyDirection[i]) as [number, number, number]} for 3 dof
                     rotation={[0, bodyRotation, -Math.PI]}
                     scale={[-0.13, -0.052, -0.17]}
@@ -95,21 +97,21 @@ export function PlayerTank({
                             castShadow
                             receiveShadow
                             geometry={nodes.Tracks007.geometry}
-                            material={materials['BodyFlat.007']}
+                            material={bodyFlatMaterial}
                         />
                         <mesh
                             name="Tracks007_1"
                             castShadow
                             receiveShadow
                             geometry={nodes.Tracks007_1.geometry}
-                            material={materials['BodyMetallic.007']}
+                            material={bodyMetallicMaterial}
                         />
                         <mesh
                             name="Tracks007_2"
                             castShadow
                             receiveShadow
                             geometry={nodes.Tracks007_2.geometry}
-                            material={materials['TracksDark.008']}
+                            material={bodyFlatMaterial}
                         />
                     </group>
                 </mesh>

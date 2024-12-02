@@ -29,7 +29,7 @@ export class Tank extends GameObject {
         velocity = new Vector2(0, 0),
         bodyRotation = 0,
         headRotation = 0,
-        color = "#FFFFFF",
+        color = "#000000",
         isDead = false,
         isFiring = false,
         isPlacingMine = false,
@@ -78,6 +78,7 @@ export class Tank extends GameObject {
     updateState(): void {
         // Update position based on velocity and time delta
         this.position.add(this.velocity.clone());
+        this.headRotation += 0.01;
 
     }
 
