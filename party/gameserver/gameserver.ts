@@ -4,7 +4,7 @@ import { createMessage } from "./messaging/messageTypes";
 import GameStateManager from "./gameManager";
 
 
-const EXPIRY_PERIOD_MILLISECONDS: number = 1 * 60 * 1000; //How long a room should be active for
+const EXPIRY_PERIOD_MILLISECONDS: number = 5 * 60 * 1000; //How long a room should be active for
 
 const TPS: number = 20;
 
